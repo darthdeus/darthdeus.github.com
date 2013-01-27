@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Ember | darthdeus vs Ember.js]]></title>
+  <link href="http://darthdeus.github.com/blog/categories/ember/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.com/"/>
+  <updated>2013-01-27T15:42:14+01:00</updated>
+  <id>http://darthdeus.github.com/</id>
+  <author>
+    <name><![CDATA[Jakub Arnold]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Ember Data in Depth]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/"/>
+    <updated>2013-01-27T13:52:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth</id>
+    <content type="html"><![CDATA[<h1>Inside Ember Data</h1>
+
+<p>This is a guide explaining how Ember Data works internaly. My initial
+motivation for writing this is to understand Ember better myself. I've
+found that every time I understand something about how Ember works, it
+improves my application code.</p>
+
+<h2>Main parts</h2>
+
+<p>First we need to understand what are the main concepts. Let's start with
+a simple example.</p>
+
+<p><code>javascript
+App.User = DS.Model.extend({
+  username: DS.attr("string")
+});
+</code></p>
+
+<p>Let's dive deep into this. There are four important concepts, two of
+which are basic Ember.js and we're going to skip them</p>
+
+<ul>
+<li><code>App.User</code> represents a <code>User</code> class in the <code>App</code> namespace</li>
+<li><code>username</code> represents a property on the <code>User</code> class</li>
+</ul>
+
+
+<p>These are the basics and you should be familiar with them to understand
+the rest of this guide. Next we have <code>DS.Model</code> and <code>DS.attr</code>:</p>
+
+<h2>DS.Model and DS.attr</h2>
+
+<p><code>DS.Model</code> is one of the core concepts in Ember Data and it represents a
+single <em>resource</em>. Models can have relationships with other models,
+similar to how you'd model your data in a relational database. But let's
+ignore that for now.</p>
+
+<p><code>DS.Model</code> is both a state machine and a promise. If you don't
+understand what promises are, please take a look at <a href="https://gist.github.com/3889970">this awesome
+article</a> which explains them in depth.</p>
+
+<p>State machines are used throughout Ember and they basically represent something <em>which can have multiple states and can transition between the states</em>. For example <code>DS.Model</code> can have the following states (<em><a href="http://emberjs.com/guides/models/model-lifecycle/">taken from the official Ember guide</a></em>):</p>
+
+<ul>
+<li><code>isLoaded</code> - The adapter has finished retrieving the current state of the record from its backend.</li>
+<li><code>isDirty</code> - The record has local changes that have not yet been saved by the adapter. This includes records that have been created (but not yet saved) or deleted.</li>
+<li><code>isSaving</code> - The record has been sent to the adapter to have its changes saved to the backend, but the adapter has not yet confirmed that the changes were successful.</li>
+<li><code>isDeleted</code> - The record was marked for deletion. When <code>isDeleted</code> is true and <code>isDirty</code> is <code>true</code>, the record is deleted locally but the deletion was not yet persisted. When <code>isSaving</code> is true, the change is in-flight. When both <code>isDirty</code> and <code>isSaving</code> are <code>false</code>, the change has been saved.</li>
+<li><code>isError</code> - The adapter reported that it was unable to save local changes to the backend. This may also result in the record having its <code>isValid</code> property become false if the adapter reported that server-side validations failed.</li>
+<li><code>isNew</code> - The record was created locally and the adapter did not yet report that it was successfully saved.
+<code>isValid</code> No client-side validations have failed and the adapter did not report any server-side validation failures.</li>
+</ul>
+
+
+<p>We can also bind to these with event handlers, which will be explained later, but for now let's just list them:</p>
+
+<ul>
+<li><code>didLoad</code></li>
+<li><code>didCreate</code></li>
+<li><code>didUpdate</code></li>
+<li><code>didDelete</code></li>
+<li><code>becameError</code></li>
+<li><code>becameInvalid</code></li>
+</ul>
+
+
+<p><em><a href="https://github.com/emberjs/data/blob/f274153754cb8b629cd98fc6c590f18bc8ee3ff6/packages/ember-data/lib/system/model/states.js#L223-L245">I would also encourage you to go take a look at the source documentation on GitHub</a></em></p>
+
+<p>It is important for us to understand what each state means, because they
+can affect how our application behaves. For example if we try to modify
+a record which is already being saved, we will get an exception saying
+something like this</p>
+
+<p><code>
+Attempted to handle event `willSetProperty` on &lt;App.User:ember1144:null&gt;
+while in state rootState.loaded.created.inFlight. Called with
+{reference: [object Object], store: &lt;App.Store:ember313&gt;, name: username}
+</code></p>
+
+<p>The important part here is the <code>rootState.loaded.created.inFlight</code>. If
+we look at <a href="https://github.com/emberjs/data/blob/f274153754cb8b629cd98fc6c590f18bc8ee3ff6/packages/ember-data/lib/system/model/states.js#L254-L261">the source of <code>DirtyState</code></a>, we can see what this means</p>
+
+<blockquote><p>Dirty states have three child states:</p>
+
+<ul>
+<li><code>uncommitted</code>: the store has not yet handed off the record to be saved.</li>
+<li><code>inFlight</code>: the store has handed off the record to be saved, but the adapter has not yet acknowledged success.</li>
+<li><code>invalid</code>: the record has invalid information and cannot be send to the adapter yet.</li>
+</ul>
+</blockquote>
+
+<p>Let's go through the record lifecycle and observe it's state. We can do
+this by doing <code>.get("stateManager.currentState.name")</code></p>
+
+<p>```javascript
+user = App.User.find(1)
+user.get("isLoaded") // => true
+user.get("isDirty") // => false
+user.get("stateManager.currentState.name") // => loaded</p>
+
+<p>user.set("username", "wycats")
+user.get("isLoaded") // => true
+user.get("isDirty") // => true, which means comitting the transaction will save the record
+user.get("stateManager.currentState.name") // => uncommitted</p>
+
+<p>user.get("transaction").commit()
+// while the record is being saved
+user.get("stateManager.currentState.name") // => inFlight
+user.get("isSaving") // => true
+// after the record was saved
+user.get("stateManager.currentState.name") // => saved
+```</p>
+
+<h2>Transactions and <code>commit()</code></h2>
+
+<p>In the previous example, we've used <code>get("transaction").commit()</code> to
+persist the changes to the server. <code>.commit()</code> will take all <code>dirty</code>
+records in the transaction and persiste them to the server.</p>
+
+<p>A record becomes dirty whenever one of it's attributes change. For
+example</p>
+
+<p><code>javascript
+user = App.User.find(1)
+user.get("isDirty") // =&gt; false
+user.set("username", "wycats")
+user.get("isDirty") // =&gt; true
+</code></p>
+
+<p>If we create a new record, it will be dirty by default</p>
+
+<p><code>javascript
+user = App.User.createRecord()
+user.get("isDirty") // =&gt; true
+</code></p>
+
+<p><a href="https://github.com/emberjs/data/pull/646">Currently there's a regression</a>
+that we change an attribute to something else, and then back to the
+original value, the record will be marked as dirty.</p>
+
+<p>```javascript
+user = App.User.find(1)
+originalUsername = user.get("username")</p>
+
+<p>user.get("isDirty") // => false
+user.set("username", "wycats")
+user.get("isDirty") // => true
+user.set("username", originalUsername)
+user.get("isDirty") // => true, even though it should be false
+```</p>
+
+<p>But let's hope this will be fixed soon.</p>
+
+<h3>Transactions</h3>
+
+<p>Until now we assumed that there is some <em>global</em> transaction which is
+the same for every single model. But this doesn't have to be true. We
+can create our own transactions and manage them at our will.</p>
+
+<p>I recommend you take a look at <a href="https://github.com/emberjs/data/blob/master/packages/ember-data/tests/integration/transactions/basic_test.js">the tests for transactions in Ember Data
+repository</a>.
+They basically show all of the scenarios which you can encounter. For
+example</p>
+
+<p>```javascript
+transaction = store.transaction();
+record = transaction.createRecord(App.User, {});</p>
+
+<p>transaction.commit(); // this will save the record to the server</p>
+
+<p>record.set("foo", "bar");
+transaction.commit(); // nothing is committed here, because the record</p>
+
+<pre><code>                  // is removed from the transaction when it is saved
+</code></pre>
+
+<p>store.commit(); // this will save the record properly
+```</p>
+
+<p>We can also add a record to a transaction, which will remove it from the
+global transaction. Important thing to note here is that
+<a href="https://github.com/emberjs/data/blob/master/packages/ember-data/lib/system/store.js#L127-L129"><code>store.transaction()</code></a>
+<strong>always returns a new transaction</strong>.</p>
+
+<p>```javascript
+user = App.User.find(1);
+transaction = store.transaction();
+transaction.add(user);</p>
+
+<p>user.set("username", "wycats");</p>
+
+<p>store.commit(); // nothing happens
+transaction.commit(); // user is saved
+```</p>
+
+<p>Same goes for deleting records</p>
+
+<p>```javascript
+user = App.User.find(1);
+transaction = store.transaction();
+transaction.add(user);</p>
+
+<p>user.deleteRecord();</p>
+
+<p>store.commit(); // nothing happens
+transaction.commit(); // user is deleted
+```</p>
+
+<p>We can also remove a record from a transaction</p>
+
+<p>```javascript
+user = App.User.find(1);
+transaction = store.transaction();</p>
+
+<p>transaction.add(user);
+transaction.remove(user);</p>
+
+<p>user.set("name", "wycats");</p>
+
+<p>transaction.commit(); // nothing happens
+```</p>
+
+<p>One scenario when transactions can be useful is when you just need to
+change one record, without affecting changes to other records. You can
+put that change in a separate transaction, instead of just doing
+<code>store.commit()</code>.</p>
+]]></content>
+  </entry>
+  
+</feed>

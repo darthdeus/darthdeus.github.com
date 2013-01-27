@@ -4,7 +4,7 @@
   <title><![CDATA[Category: controller | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/controller/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-01-27T12:38:31+01:00</updated>
+  <updated>2013-01-27T15:42:14+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -18,15 +18,20 @@
     <link href="http://darthdeus.github.com/blog/2013/01/27/controllers-needs-explained/"/>
     <updated>2013-01-27T11:53:00+01:00</updated>
     <id>http://darthdeus.github.com/blog/2013/01/27/controllers-needs-explained</id>
-    <content type="html"><![CDATA[<p>Since the v2 router came it became clear that using global singleton controllers like <code>App.userController = App.UserController.create()</code> is not the way to go. This prevents us from doing a simple binding like</p>
+    <content type="html"><![CDATA[<p>Since the v2 router came it became clear that using global singleton
+controllers like <code>App.userController = App.UserController.create()</code> is
+not the way to go. This prevents us from doing a simple binding like</p>
 
 <p><code>javascript
-App.UserController = Ember.Controller.extend({
+App.UserController = Ember.ObjectController.extend({
   accountsBinding: "App.accountsController.content"
 })
 </code></p>
 
-<p>There is no need or even possibility to manage the controller instances with the new router though. It will create the instance for us. One way we can use this is with <code>this.controllerFor</code>, which can be used inside of a route.</p>
+<p>There is no need or even possibility to manage the controller instances
+with the new router though. It will create the instance for us. One way
+we can use this is with <code>this.controllerFor</code>, which can be used inside
+of a route.</p>
 
 <p>```javascript
 App.UserRoute = Ember.Route.extend({
@@ -39,15 +44,21 @@ App.UserRoute = Ember.Route.extend({
 })
 ```</p>
 
-<p>but since this method is only available on the route and not inside a controller, it wasn't very pleasant to specify dependencies (or needs) between controllers. Which is exactly where needs come in and solve the issue</p>
+<p>but since this method is only available on the route and not inside a
+controller, it wasn't very pleasant to specify dependencies (or needs)
+between controllers. Which is exactly where needs come in and solve the
+issue</p>
 
 <p><code>javascript
-App.UserController = Ember.Controller.extend({
+App.UserController = Ember.ObjectController.extend({
   needs: ["foo"]
 });
 </code></p>
 
-<p>this will give you the opportunity to call <code>controllers.foo</code> on the <code>App.UserController</code> instance and get back an instance of <code>App.FooController</code>. You could even (ab)use that in the templates like this</p>
+<p>this will give you the opportunity to call <code>controllers.foo</code> on the
+<code>App.UserController</code> instance and get back an instance of
+<code>App.FooController</code>. You could even (ab)use that in the templates like
+this</p>
 
 <p>```html</p>
 
@@ -72,22 +83,33 @@ App.Router.map(function() {
 });
 ```</p>
 
-<p>In this case we will get <code>post</code>, <code>post.index</code> and <code>post.edit</code>. If you go to <code>/posts/1</code> you expect to get <code>post.index</code> template, which is true, but the context (or model, or content) is being set on the <code>PostController</code>, not on <code>PostIndexController</code>.</p>
+<p>In this case we will get <code>post</code>, <code>post.index</code> and <code>post.edit</code>. If you go
+to <code>/posts/1</code> you expect to get <code>post.index</code> template, which is true,
+but the context (or model, or content) is being set on the
+<code>PostController</code>, not on <code>PostIndexController</code>.</p>
 
-<p>When you think about it it does make sense, because the <code>resource</code> is basically shared between <code>post.index</code> and <code>post.edit</code>, that's why it is fetched and stored in their parent. Let's go through this in detail:</p>
+<p>When you think about it it does make sense, because the <code>resource</code> is
+basically shared between <code>post.index</code> and <code>post.edit</code>, that's why it is
+fetched and stored in their parent. Let's go through this in detail:</p>
 
 <ul>
 <li>visit <code>/posts/1</code></li>
-<li>router basically does <code>App.Post.find(1)</code> <strong>and assigns that to the content of <code>PostController</code></strong></li>
+<li>router basically does <code>App.Post.find(1)</code> <strong>and assigns that to the
+content of <code>PostController</code></strong></li>
 <li>template <code>post</code> is rendered</li>
 <li>template <code>post.index</code> is rendered in <code>post</code>'s outlet</li>
 </ul>
 
 
-<p>and when you transition to <code>/posts/1/edit</code>, the only thing that changes is the leaf route, you still keep the same <code>App.Post</code> model, because it belongs to the parent <code>PostRoute</code>, not to the leaf <code>PostIndexRoute</code>. But this has a drawback. You're not able to directly access the content from the <code>post.index</code> template, since it doesn't belong to it's controller. That's where needs come in.</p>
+<p>and when you transition to <code>/posts/1/edit</code>, the only thing that changes
+is the leaf route, you still keep the same <code>App.Post</code> model, because it
+belongs to the parent <code>PostRoute</code>, not to the leaf <code>PostIndexRoute</code>. But
+this has a drawback. You're not able to directly access the content from
+the <code>post.index</code> template, since it doesn't belong to it's controller.
+That's where needs come in.</p>
 
 <p><code>javascript
-App.PostIndexController = Ember.Controller.extend({
+App.PostIndexController = Ember.ObjectController.extend({
   needs: ["post"]
 })
 </code></p>
@@ -98,7 +120,8 @@ App.PostIndexController = Ember.Controller.extend({
 {{controllers.post.content}}
 </code></p>
 
-<p>By specifying the need Ember will make sure that it gives you the right <code>PostController</code> instance with it's content set to the right value.</p>
+<p>By specifying the need Ember will make sure that it gives you the right
+<code>PostController</code> instance with it's content set to the right value.</p>
 ]]></content>
   </entry>
   

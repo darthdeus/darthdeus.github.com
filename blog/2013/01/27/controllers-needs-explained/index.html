@@ -9,7 +9,9 @@
   <meta name="author" content="Jakub Arnold">
 
   
-  <meta name="description" content="Since the v2 router came it became clear that using global singleton controllers like App.userController = App.UserController.create() is not the way &hellip;">
+  <meta name="description" content="Since the v2 router came it became clear that using global singleton
+controllers like App.userController = App.UserController.create() is
+not the way &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -100,18 +102,23 @@
   </header>
 
 
-<div class="entry-content"><p>Since the v2 router came it became clear that using global singleton controllers like <code>App.userController = App.UserController.create()</code> is not the way to go. This prevents us from doing a simple binding like</p>
+<div class="entry-content"><p>Since the v2 router came it became clear that using global singleton
+controllers like <code>App.userController = App.UserController.create()</code> is
+not the way to go. This prevents us from doing a simple binding like</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">UserController</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Controller</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">UserController</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">ObjectController</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
 </span><span class='line'>  <span class="nx">accountsBinding</span><span class="o">:</span> <span class="s2">&quot;App.accountsController.content&quot;</span>
 </span><span class='line'><span class="p">})</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>There is no need or even possibility to manage the controller instances with the new router though. It will create the instance for us. One way we can use this is with <code>this.controllerFor</code>, which can be used inside of a route.</p>
+<p>There is no need or even possibility to manage the controller instances
+with the new router though. It will create the instance for us. One way
+we can use this is with <code>this.controllerFor</code>, which can be used inside
+of a route.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -126,18 +133,24 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>but since this method is only available on the route and not inside a controller, it wasn&#8217;t very pleasant to specify dependencies (or needs) between controllers. Which is exactly where needs come in and solve the issue</p>
+<p>but since this method is only available on the route and not inside a
+controller, it wasn&#8217;t very pleasant to specify dependencies (or needs)
+between controllers. Which is exactly where needs come in and solve the
+issue</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">UserController</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Controller</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">UserController</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">ObjectController</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
 </span><span class='line'>  <span class="nx">needs</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">]</span>
 </span><span class='line'><span class="p">});</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>this will give you the opportunity to call <code>controllers.foo</code> on the <code>App.UserController</code> instance and get back an instance of <code>App.FooController</code>. You could even (ab)use that in the templates like this</p>
+<p>this will give you the opportunity to call <code>controllers.foo</code> on the
+<code>App.UserController</code> instance and get back an instance of
+<code>App.FooController</code>. You could even (ab)use that in the templates like
+this</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -163,24 +176,35 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>In this case we will get <code>post</code>, <code>post.index</code> and <code>post.edit</code>. If you go to <code>/posts/1</code> you expect to get <code>post.index</code> template, which is true, but the context (or model, or content) is being set on the <code>PostController</code>, not on <code>PostIndexController</code>.</p>
+<p>In this case we will get <code>post</code>, <code>post.index</code> and <code>post.edit</code>. If you go
+to <code>/posts/1</code> you expect to get <code>post.index</code> template, which is true,
+but the context (or model, or content) is being set on the
+<code>PostController</code>, not on <code>PostIndexController</code>.</p>
 
-<p>When you think about it it does make sense, because the <code>resource</code> is basically shared between <code>post.index</code> and <code>post.edit</code>, that&#8217;s why it is fetched and stored in their parent. Let&#8217;s go through this in detail:</p>
+<p>When you think about it it does make sense, because the <code>resource</code> is
+basically shared between <code>post.index</code> and <code>post.edit</code>, that&#8217;s why it is
+fetched and stored in their parent. Let&#8217;s go through this in detail:</p>
 
 <ul>
 <li>visit <code>/posts/1</code></li>
-<li>router basically does <code>App.Post.find(1)</code> <strong>and assigns that to the content of <code>PostController</code></strong></li>
+<li>router basically does <code>App.Post.find(1)</code> <strong>and assigns that to the
+content of <code>PostController</code></strong></li>
 <li>template <code>post</code> is rendered</li>
 <li>template <code>post.index</code> is rendered in <code>post</code>&#8217;s outlet</li>
 </ul>
 
 
-<p>and when you transition to <code>/posts/1/edit</code>, the only thing that changes is the leaf route, you still keep the same <code>App.Post</code> model, because it belongs to the parent <code>PostRoute</code>, not to the leaf <code>PostIndexRoute</code>. But this has a drawback. You&#8217;re not able to directly access the content from the <code>post.index</code> template, since it doesn&#8217;t belong to it&#8217;s controller. That&#8217;s where needs come in.</p>
+<p>and when you transition to <code>/posts/1/edit</code>, the only thing that changes
+is the leaf route, you still keep the same <code>App.Post</code> model, because it
+belongs to the parent <code>PostRoute</code>, not to the leaf <code>PostIndexRoute</code>. But
+this has a drawback. You&#8217;re not able to directly access the content from
+the <code>post.index</code> template, since it doesn&#8217;t belong to it&#8217;s controller.
+That&#8217;s where needs come in.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">PostIndexController</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Controller</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">PostIndexController</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">ObjectController</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
 </span><span class='line'>  <span class="nx">needs</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;post&quot;</span><span class="p">]</span>
 </span><span class='line'><span class="p">})</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -193,7 +217,8 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>By specifying the need Ember will make sure that it gives you the right <code>PostController</code> instance with it&#8217;s content set to the right value.</p>
+<p>By specifying the need Ember will make sure that it gives you the right
+<code>PostController</code> instance with it&#8217;s content set to the right value.</p>
 </div>
 
 
@@ -240,6 +265,8 @@
     <p class="meta">
       
       
+        <a class="basic-alignment right articlenav" href="/blog/2013/01/27/ember-data-in-depth/" title="Next Post: Ember Data in Depth">Ember Data in Depth &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -251,6 +278,10 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/01/27/ember-data-in-depth/">Ember Data in Depth</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/01/27/controllers-needs-explained/">Controller's Needs Explained</a>
