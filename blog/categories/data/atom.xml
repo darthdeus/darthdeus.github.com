@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Data | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/data/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-01-27T15:43:28+01:00</updated>
+  <updated>2013-01-27T15:57:05+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -242,6 +242,8 @@ transaction.remove(user);</p>
 change one record, without affecting changes to other records. You can
 put that change in a separate transaction, instead of just doing
 <code>store.commit()</code>.</p>
+
+<p><strong>More content will be coming soon</strong></p>
 ]]></content>
   </entry>
   
