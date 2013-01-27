@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Data | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/data/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-01-27T15:42:14+01:00</updated>
+  <updated>2013-01-27T15:43:28+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -18,9 +18,7 @@
     <link href="http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/"/>
     <updated>2013-01-27T13:52:00+01:00</updated>
     <id>http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth</id>
-    <content type="html"><![CDATA[<h1>Inside Ember Data</h1>
-
-<p>This is a guide explaining how Ember Data works internaly. My initial
+    <content type="html"><![CDATA[<p>This is a guide explaining how Ember Data works internaly. My initial
 motivation for writing this is to understand Ember better myself. I've
 found that every time I understand something about how Ember works, it
 improves my application code.</p>
