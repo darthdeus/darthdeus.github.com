@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: core | darthdeus vs Ember.js]]></title>
+  <link href="http://darthdeus.github.com/blog/categories/core/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.com/"/>
+  <updated>2013-01-27T18:55:33+01:00</updated>
+  <id>http://darthdeus.github.com/</id>
+  <author>
+    <name><![CDATA[Jakub Arnold]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Concatenated Properties]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/01/27/concatenated-properties/"/>
+    <updated>2013-01-27T18:18:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/01/27/concatenated-properties</id>
+    <content type="html"><![CDATA[<p>As some of you might now, Ember provides you with something called
+<em>concatenated property</em>. Their main use case is internal, which means
+you are unlikely to have the need to use them in your own application.
+There are some places in Ember where you might be surprised by how
+things behave and this might be one of those. Let's start with an
+example.</p>
+
+<p>```javascript
+App.UserView = Ember.View.extend({
+  classNames: ["user"]
+});</p>
+
+<p>App.UserView.create().get("classNames") // => ["ember-view", "user"]
+```</p>
+
+<p>Now you might be asking, where is the <code>"ember-view"</code> coming from? Time
+for another example</p>
+
+<p>```javascript
+App.DetailUserView = App.User.extend({
+  classNames: ["more", "detail"]
+});</p>
+
+<p>App.DetailUserView.create().get("classNames") // => ["ember-view", "user", "more", "detail"]
+```</p>
+
+<p>This must be some sorcery! It seems that <code>classNames</code> aren't overwritten
+in the subclass, but rather concatenated to the superclass' value of
+that property. This works even when you overwrite it in an instance.</p>
+
+<p><code>javascript
+Ember.View.create({ classNames: ["cat"] }).get("classNames") // =&gt; ["ember-view", "cat"]
+</code></p>
+
+<p>A simple glance at the <a href="https://github.com/emberjs/ember.js/blob/master/packages/ember-views/lib/views/view.js#L756"><code>Ember.View</code></a> source code reveals it's secrets</p>
+
+<p>```javascript
+Ember.View = Ember.CoreView.extend({</p>
+
+<p>  concatenatedProperties: ['classNames', 'classNameBindings', 'attributeBindings'],</p>
+
+<p>  // more stuff
+```</p>
+
+<p>If this still doesn't make any sense to you, just go take a look at <a href="https://github.com/emberjs/ember.js/blob/master/packages/ember-metal/tests/mixin/concatenatedProperties_test.js">the
+tests for concatenated properties</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

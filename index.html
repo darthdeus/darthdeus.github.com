@@ -9,8 +9,9 @@
   <meta name="author" content="Jakub Arnold">
 
   
-  <meta name="description" content="This is a guide explaining how Ember Data works internaly. My initial
-motivation for writing this is to understand Ember better myself. I&#8217;ve &hellip;">
+  <meta name="description" content="As some of you might now, Ember provides you with something called
+concatenated property. Their main use case is internal, which means
+you are &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -68,6 +69,105 @@ motivation for writing this is to understand Ember better myself. I&#8217;ve &he
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/01/27/concatenated-properties/">Concatenated Properties</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-27T18:18:00+01:00" pubdate data-updated="true">Jan 27<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>As some of you might now, Ember provides you with something called
+<em>concatenated property</em>. Their main use case is internal, which means
+you are unlikely to have the need to use them in your own application.
+There are some places in Ember where you might be surprised by how
+things behave and this might be one of those. Let&#8217;s start with an
+example.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">UserView</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">classNames</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">]</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">UserView</span><span class="p">.</span><span class="nx">create</span><span class="p">().</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;classNames&quot;</span><span class="p">)</span> <span class="c1">// =&gt; [&quot;ember-view&quot;, &quot;user&quot;]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now you might be asking, where is the <code>"ember-view"</code> coming from? Time
+for another example</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">DetailUserView</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">classNames</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;more&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">]</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">DetailUserView</span><span class="p">.</span><span class="nx">create</span><span class="p">().</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;classNames&quot;</span><span class="p">)</span> <span class="c1">// =&gt; [&quot;ember-view&quot;, &quot;user&quot;, &quot;more&quot;, &quot;detail&quot;]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This must be some sorcery! It seems that <code>classNames</code> aren&#8217;t overwritten
+in the subclass, but rather concatenated to the superclass&#8217; value of
+that property. This works even when you overwrite it in an instance.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">Ember</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span> <span class="nx">classNames</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;cat&quot;</span><span class="p">]</span> <span class="p">}).</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;classNames&quot;</span><span class="p">)</span> <span class="c1">// =&gt; [&quot;ember-view&quot;, &quot;cat&quot;]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A simple glance at the <a href="https://github.com/emberjs/ember.js/blob/master/packages/ember-views/lib/views/view.js#L756"><code>Ember.View</code></a> source code reveals it&#8217;s secrets</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">Ember</span><span class="p">.</span><span class="nx">View</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">CoreView</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">concatenatedProperties</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;classNames&#39;</span><span class="p">,</span> <span class="s1">&#39;classNameBindings&#39;</span><span class="p">,</span> <span class="s1">&#39;attributeBindings&#39;</span><span class="p">],</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// more stuff</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If this still doesn&#8217;t make any sense to you, just go take a look at <a href="https://github.com/emberjs/ember.js/blob/master/packages/ember-metal/tests/mixin/concatenatedProperties_test.js">the
+tests for concatenated properties</a>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -467,6 +567,82 @@ bucket</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>Now let&#8217;s take a look at the source code of <code>transaction.commit()</code>.
+Let&#8217;s pretend that there is nothing about relationship</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">commit</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">store</span> <span class="o">=</span> <span class="nx">get</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&#39;store&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">adapter</span> <span class="o">=</span> <span class="nx">get</span><span class="p">(</span><span class="nx">store</span><span class="p">,</span> <span class="s1">&#39;_adapter&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">defaultTransaction</span> <span class="o">=</span> <span class="nx">get</span><span class="p">(</span><span class="nx">store</span><span class="p">,</span> <span class="s1">&#39;defaultTransaction&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">iterate</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">records</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">set</span> <span class="o">=</span> <span class="nx">records</span><span class="p">.</span><span class="nx">copy</span><span class="p">();</span>
+</span><span class='line'>    <span class="c1">// iterating over all of the given records</span>
+</span><span class='line'>    <span class="nx">set</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">record</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// send the record to `inFlight` state</span>
+</span><span class='line'>      <span class="nx">record</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;willCommit&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">set</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">relationships</span> <span class="o">=</span> <span class="nx">get</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&#39;relationships&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">commitDetails</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// each bucket is processed separately</span>
+</span><span class='line'>    <span class="nx">created</span><span class="o">:</span> <span class="nx">iterate</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">bucketForType</span><span class="p">(</span><span class="s1">&#39;created&#39;</span><span class="p">)),</span>
+</span><span class='line'>    <span class="nx">updated</span><span class="o">:</span> <span class="nx">iterate</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">bucketForType</span><span class="p">(</span><span class="s1">&#39;updated&#39;</span><span class="p">)),</span>
+</span><span class='line'>    <span class="nx">deleted</span><span class="o">:</span> <span class="nx">iterate</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">bucketForType</span><span class="p">(</span><span class="s1">&#39;deleted&#39;</span><span class="p">)),</span>
+</span><span class='line'>    <span class="nx">relationships</span><span class="o">:</span> <span class="nx">relationships</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="k">this</span> <span class="o">===</span> <span class="nx">defaultTransaction</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">set</span><span class="p">(</span><span class="nx">store</span><span class="p">,</span> <span class="s1">&#39;defaultTransaction&#39;</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">transaction</span><span class="p">());</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">removeCleanRecords</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">commitDetails</span><span class="p">.</span><span class="nx">created</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">()</span> <span class="o">||</span> <span class="o">!</span><span class="nx">commitDetails</span><span class="p">.</span><span class="nx">updated</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">()</span> <span class="o">||</span> <span class="o">!</span><span class="nx">commitDetails</span><span class="p">.</span><span class="nx">deleted</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">()</span> <span class="o">||</span> <span class="o">!</span><span class="nx">relationships</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">adapter</span> <span class="o">&amp;&amp;</span> <span class="nx">adapter</span><span class="p">.</span><span class="nx">commit</span><span class="p">)</span> <span class="p">{</span> <span class="nx">adapter</span><span class="p">.</span><span class="nx">commit</span><span class="p">(</span><span class="nx">store</span><span class="p">,</span> <span class="nx">commitDetails</span><span class="p">);</span> <span class="p">}</span>
+</span><span class='line'>    <span class="k">else</span> <span class="p">{</span> <span class="k">throw</span> <span class="nx">fmt</span><span class="p">(</span><span class="s2">&quot;Adapter is either null or does not implement `commit` method&quot;</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span> <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
 <p><strong>More content will be coming soon</strong></p>
 </div>
   
@@ -642,6 +818,10 @@ That&#8217;s where needs come in.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/01/27/concatenated-properties/">Concatenated Properties</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/01/27/ember-data-in-depth/">Ember Data in Depth</a>
       </li>
     
@@ -717,10 +897,21 @@ That&#8217;s where needs come in.</p>
 
 
 
-
+<script type="text/javascript">
+  var _gauges = _gauges || [];
+  (function() {
+    var t   = document.createElement('script');
+    t.type  = 'text/javascript';
+    t.async = true;
+    t.id    = 'gauges-tracker';
+    t.setAttribute('data-site-id', '510566d5613f5d430600000d');
+    t.src = '//secure.gaug.es/track.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(t, s);
+  })();
+</script>
 
 <script type="text/javascript">
-
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-38013151-1']);
   _gaq.push(['_trackPageview']);
@@ -732,6 +923,7 @@ That&#8217;s where needs come in.</p>
   })();
 
 </script>
+
 
 </body>
 </html>
