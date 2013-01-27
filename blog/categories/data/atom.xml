@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Data | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/data/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-01-27T16:00:16+01:00</updated>
+  <updated>2013-01-27T16:37:48+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -169,7 +169,7 @@ user.get("isDirty") // => true, even though it should be false
 
 <p>But let's hope this will be fixed soon.</p>
 
-<h3>Transactions</h3>
+<h2>Transactions</h2>
 
 <p>Until now we assumed that there is some <em>global</em> transaction which is
 the same for every single model. But this doesn't have to be true. We
@@ -242,6 +242,63 @@ transaction.remove(user);</p>
 change one record, without affecting changes to other records. You can
 put that change in a separate transaction, instead of just doing
 <code>store.commit()</code>.</p>
+
+<p>Important thing to note here is that there's a <code>defaultTransaction</code> for
+the store to which you can get via <code>store.get("defaultTransaction")</code>.
+This is where all of the records are placed, unless you explicitly
+create a new transaction and assign a record to it.</p>
+
+<p>These two are completely equivalent</p>
+
+<p><code>javascript
+store.commit();
+store.get("defaultTransaction").commit();
+</code></p>
+
+<p>Just take a look at how <code>store.commit()</code> is defined</p>
+
+<p><code>javascript
+commit: function() {
+  get(this, 'defaultTransaction').commit();
+},
+</code></p>
+
+<h2><code>commit()</code></h2>
+
+<p>Now that we understand how transactions work, let's dig deep into
+<code>store.commit()</code>. First thing we need to understand here is that Ember
+Transactions use this thing called <code>bucket</code> to store records with
+various states in. This is first initialized in the <a href="https://github.com/emberjs/data/blob/master/packages/ember-data/lib/system/transaction.js#L91-L101"><code>init</code> method of
+<code>DS.Transaction</code></a></p>
+
+<p>```javascript
+init: function() {
+  set(this, 'buckets', {</p>
+
+<pre><code>clean:    Ember.OrderedSet.create(),
+created:  Ember.OrderedSet.create(),
+updated:  Ember.OrderedSet.create(),
+deleted:  Ember.OrderedSet.create(),
+inflight: Ember.OrderedSet.create()
+</code></pre>
+
+<p>  });</p>
+
+<p>  set(this, 'relationships', Ember.OrderedSet.create());
+}
+```</p>
+
+<p>Each bucket represents one state in which a record can possibly be.
+These are used in many different places in the transaction, and every
+time a method changes it's state, it will be moved to a corresponding
+bucket</p>
+
+<p><code>javascript Example of recordBecameDirty
+recordBecameDirty: function(bucketType, record) {
+  this.removeFromBucket('clean', record);
+  this.addToBucket(bucketType, record);
+},
+</code></p>
 
 <p><strong>More content will be coming soon</strong></p>
 ]]></content>

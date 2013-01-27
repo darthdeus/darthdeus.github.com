@@ -4,7 +4,7 @@
   <title><![CDATA[darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-01-27T16:00:16+01:00</updated>
+  <updated>2013-01-27T16:37:48+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -205,7 +205,7 @@ original value, the record will be marked as dirty.</p>
 
 <p>But let&#8217;s hope this will be fixed soon.</p>
 
-<h3>Transactions</h3>
+<h2>Transactions</h2>
 
 <p>Until now we assumed that there is some <em>global</em> transaction which is
 the same for every single model. But this doesn&#8217;t have to be true. We
@@ -311,6 +311,80 @@ global transaction. Important thing to note here is that
 change one record, without affecting changes to other records. You can
 put that change in a separate transaction, instead of just doing
 <code>store.commit()</code>.</p>
+
+<p>Important thing to note here is that there&#8217;s a <code>defaultTransaction</code> for
+the store to which you can get via <code>store.get("defaultTransaction")</code>.
+This is where all of the records are placed, unless you explicitly
+create a new transaction and assign a record to it.</p>
+
+<p>These two are completely equivalent</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">store</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span>
+</span><span class='line'><span class="nx">store</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;defaultTransaction&quot;</span><span class="p">).</span><span class="nx">commit</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Just take a look at how <code>store.commit()</code> is defined</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">commit</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">get</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&#39;defaultTransaction&#39;</span><span class="p">).</span><span class="nx">commit</span><span class="p">();</span>
+</span><span class='line'><span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2><code>commit()</code></h2>
+
+<p>Now that we understand how transactions work, let&#8217;s dig deep into
+<code>store.commit()</code>. First thing we need to understand here is that Ember
+Transactions use this thing called <code>bucket</code> to store records with
+various states in. This is first initialized in the <a href="https://github.com/emberjs/data/blob/master/packages/ember-data/lib/system/transaction.js#L91-L101"><code>init</code> method of
+<code>DS.Transaction</code></a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">init</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&#39;buckets&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">clean</span><span class="o">:</span>    <span class="nx">Ember</span><span class="p">.</span><span class="nx">OrderedSet</span><span class="p">.</span><span class="nx">create</span><span class="p">(),</span>
+</span><span class='line'>    <span class="nx">created</span><span class="o">:</span>  <span class="nx">Ember</span><span class="p">.</span><span class="nx">OrderedSet</span><span class="p">.</span><span class="nx">create</span><span class="p">(),</span>
+</span><span class='line'>    <span class="nx">updated</span><span class="o">:</span>  <span class="nx">Ember</span><span class="p">.</span><span class="nx">OrderedSet</span><span class="p">.</span><span class="nx">create</span><span class="p">(),</span>
+</span><span class='line'>    <span class="nx">deleted</span><span class="o">:</span>  <span class="nx">Ember</span><span class="p">.</span><span class="nx">OrderedSet</span><span class="p">.</span><span class="nx">create</span><span class="p">(),</span>
+</span><span class='line'>    <span class="nx">inflight</span><span class="o">:</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">OrderedSet</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&#39;relationships&#39;</span><span class="p">,</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">OrderedSet</span><span class="p">.</span><span class="nx">create</span><span class="p">());</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Each bucket represents one state in which a record can possibly be.
+These are used in many different places in the transaction, and every
+time a method changes it&#8217;s state, it will be moved to a corresponding
+bucket</p>
+
+<figure class='code'><figcaption><span>Example of recordBecameDirty</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">recordBecameDirty</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">bucketType</span><span class="p">,</span> <span class="nx">record</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">removeFromBucket</span><span class="p">(</span><span class="s1">&#39;clean&#39;</span><span class="p">,</span> <span class="nx">record</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">addToBucket</span><span class="p">(</span><span class="nx">bucketType</span><span class="p">,</span> <span class="nx">record</span><span class="p">);</span>
+</span><span class='line'><span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p><strong>More content will be coming soon</strong></p>
 ]]></content>
