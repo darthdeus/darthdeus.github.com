@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>darthdeus vs Ember.js</title>
+  <title>Controller's Needs Explained - darthdeus vs Ember.js</title>
   <meta name="author" content="Jakub Arnold">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://darthdeus.github.com/">
+  <link rel="canonical" href="http://darthdeus.github.com/blog/2013/01/27/controllers-needs-explained/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -70,16 +70,13 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
-        <h1 class="entry-title"><a href="/blog/2013/01/27/controllers-needs-explained/">Controller&#8217;s Needs Explained</a></h1>
+      
+        <h1 class="entry-title">Controller's Needs Explained</h1>
       
     
     
@@ -103,7 +100,7 @@
   </header>
 
 
-  <div class="entry-content"><p>Since the v2 router came it became clear that using global singleton controllers like <code>App.userController = App.UserController.create()</code> is not the way to go. This prevents us from doing a simple binding like</p>
+<div class="entry-content"><p>Since the v2 router came it became clear that using global singleton controllers like <code>App.userController = App.UserController.create()</code> is not the way to go. This prevents us from doing a simple binding like</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -198,18 +195,57 @@
 
 <p>By specifying the need Ember will make sure that it gives you the right <code>PostController</code> instance with it&#8217;s content set to the right value.</p>
 </div>
+
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Jakub Arnold</span></span>
+
+      
+
+
+
+
+
+
+
+
   
 
 
-    </article>
+<time datetime="2013-01-27T11:53:00+01:00" pubdate data-updated="true">Jan 27<span>th</span>, 2013</time>
+      
+
+<span class="categories">
   
-  <div class="pagination">
+    <a class='category' href='/blog/categories/controller/'>controller</a>
+  
+</span>
+
+
+    </p>
     
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://darthdeus.github.com/blog/2013/01/27/controllers-needs-explained/" data-via="" data-counturl="http://darthdeus.github.com/blog/2013/01/27/controllers-needs-explained/" >Tweet</a>
+  
+  
+  
 </div>
+
+    
+    <p class="meta">
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -217,7 +253,7 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/01/27/controllers-needs-explained/">Controller&#8217;s Needs Explained</a>
+        <a href="/blog/2013/01/27/controllers-needs-explained/">Controller's Needs Explained</a>
       </li>
     
   </ul>
@@ -230,6 +266,7 @@
 
   
 </aside>
+
 
     </div>
   </div>
