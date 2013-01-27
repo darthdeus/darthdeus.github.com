@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ember | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/ember/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-01-27T18:55:33+01:00</updated>
+  <updated>2013-01-28T00:52:43+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -299,59 +299,6 @@ recordBecameDirty: function(bucketType, record) {
   this.addToBucket(bucketType, record);
 },
 </code></p>
-
-<p>Now let's take a look at the source code of <code>transaction.commit()</code>.
-Let's pretend that there is nothing about relationship</p>
-
-<p>```javascript
-commit: function() {
-  var store = get(this, 'store');
-  var adapter = get(store, '_adapter');
-  var defaultTransaction = get(store, 'defaultTransaction');</p>
-
-<p>  var iterate = function(records) {</p>
-
-<pre><code>var set = records.copy();
-// iterating over all of the given records
-set.forEach(function (record) {
-  // send the record to `inFlight` state
-  record.send('willCommit');
-});
-return set;
-</code></pre>
-
-<p>  };</p>
-
-<p>  var relationships = get(this, 'relationships');</p>
-
-<p>  var commitDetails = {</p>
-
-<pre><code>// each bucket is processed separately
-created: iterate(this.bucketForType('created')),
-updated: iterate(this.bucketForType('updated')),
-deleted: iterate(this.bucketForType('deleted')),
-relationships: relationships
-</code></pre>
-
-<p>  };</p>
-
-<p>  if (this === defaultTransaction) {</p>
-
-<pre><code>set(store, 'defaultTransaction', store.transaction());
-</code></pre>
-
-<p>  }</p>
-
-<p>  this.removeCleanRecords();</p>
-
-<p>  if (!commitDetails.created.isEmpty() || !commitDetails.updated.isEmpty() || !commitDetails.deleted.isEmpty() || !relationships.isEmpty()) {</p>
-
-<pre><code>if (adapter &amp;&amp; adapter.commit) { adapter.commit(store, commitDetails); }
-else { throw fmt("Adapter is either null or does not implement `commit` method", this); }
-</code></pre>
-
-<p>  }
-```</p>
 
 <p><strong>More content will be coming soon</strong></p>
 ]]></content>

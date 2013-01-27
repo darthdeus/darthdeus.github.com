@@ -4,7 +4,7 @@
   <title><![CDATA[Category: controller | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/controller/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-01-27T18:55:33+01:00</updated>
+  <updated>2013-01-28T00:52:43+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -12,6 +12,75 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Controller, ObjectController and ObjectProxy]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy/"/>
+    <updated>2013-01-27T19:24:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy</id>
+    <content type="html"><![CDATA[<p>When you first come to Ember, you'll soon stumble upon three things:</p>
+
+<ul>
+<li><code>Ember.Controller</code></li>
+<li><code>Ember.ObjectController</code></li>
+<li><code>Ember.ArrayController</code></li>
+</ul>
+
+
+<p>For some people (including me) it is not very clear what's the
+difference between the first two.</p>
+
+<p><code>Ember.Controller</code> is just a plain implementation of
+<code>Ember.ControllerMixin</code>, while <code>Ember.ObjectController</code> is a subclass of
+<code>Ember.ObjectProxy</code>. This is a huge difference! Let's take a look at how
+<code>Ember.ObjectProxy</code> works, and as always starting with a code sample
+(<a href="https://github.com/emberjs/ember.js/blob/master/packages/ember-runtime/lib/system/object_proxy.js#L35-L50">taken from the excellent source code documentation</a>).</p>
+
+<p>```javascript
+object = Ember.Object.create({
+  name: "foo"
+});</p>
+
+<p>proxy = Ember.ObjectProxy.create({
+  content: object
+});</p>
+
+<p>// Access and change existing properties
+proxy.get("name") // => "foo"
+proxy.set("name", "bar");
+object.get("name") // => "bar"</p>
+
+<p>// Create new "description" property on <code>object</code>
+proxy.set("description", "baz");
+object.get("description") // => "baz"
+```</p>
+
+<p>There is really no magic. In the basic usage, <code>Ember.ObjectProxy</code> will
+delegate all of it's unknown properties to the <code>content</code> object, with
+one exception.</p>
+
+<p>If we try to set a new property on a proxy while it's content is
+undefined, we will get an exception.</p>
+
+<p><code>javascript
+proxy = Ember.ObjectProxy.create();
+proxy.set("foo", "bar"); // raises the following exception
+</code></p>
+
+<p><code>
+Cannot delegate set('foo', bar) to the 'content' property
+of object proxy &lt;Ember.ObjectProxy:ember420&gt;: its 'content' is undefined.
+</code></p>
+
+<p>I've stumbled upon this in one scenario, where I didn't set content for
+my <code>ObjectController</code>, but I tried to modify one of it's properties.
+Raising the exception is a good example of failing fast, rather than
+silently swallowing errors.</p>
+
+<p>This being said you should almost always use <code>Ember.ObjectController</code>
+over <code>Ember.Controller</code>, unless you know what you're doing :)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Controller's Needs Explained]]></title>

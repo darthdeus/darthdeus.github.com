@@ -4,7 +4,7 @@
   <title><![CDATA[darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-01-27T18:55:33+01:00</updated>
+  <updated>2013-01-28T00:52:43+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -12,6 +12,106 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Controller, ObjectController and ObjectProxy]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy/"/>
+    <updated>2013-01-27T19:24:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy</id>
+    <content type="html"><![CDATA[<p>When you first come to Ember, you&#8217;ll soon stumble upon three things:</p>
+
+<ul>
+<li><code>Ember.Controller</code></li>
+<li><code>Ember.ObjectController</code></li>
+<li><code>Ember.ArrayController</code></li>
+</ul>
+
+
+<p>For some people (including me) it is not very clear what&#8217;s the
+difference between the first two.</p>
+
+<p><code>Ember.Controller</code> is just a plain implementation of
+<code>Ember.ControllerMixin</code>, while <code>Ember.ObjectController</code> is a subclass of
+<code>Ember.ObjectProxy</code>. This is a huge difference! Let&#8217;s take a look at how
+<code>Ember.ObjectProxy</code> works, and as always starting with a code sample
+(<a href="https://github.com/emberjs/ember.js/blob/master/packages/ember-runtime/lib/system/object_proxy.js#L35-L50">taken from the excellent source code documentation</a>).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">object</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;foo&quot;</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">proxy</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">ObjectProxy</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">content</span><span class="o">:</span> <span class="nx">object</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Access and change existing properties</span>
+</span><span class='line'><span class="nx">proxy</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="c1">// =&gt; &quot;foo&quot;</span>
+</span><span class='line'><span class="nx">proxy</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">object</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="c1">// =&gt; &quot;bar&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Create new &quot;description&quot; property on `object`</span>
+</span><span class='line'><span class="nx">proxy</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;baz&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">object</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">)</span> <span class="c1">// =&gt; &quot;baz&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There is really no magic. In the basic usage, <code>Ember.ObjectProxy</code> will
+delegate all of it&#8217;s unknown properties to the <code>content</code> object, with
+one exception.</p>
+
+<p>If we try to set a new property on a proxy while it&#8217;s content is
+undefined, we will get an exception.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">proxy</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">ObjectProxy</span><span class="p">.</span><span class="nx">create</span><span class="p">();</span>
+</span><span class='line'><span class="nx">proxy</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">);</span> <span class="c1">// raises the following exception</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">Cannot</span> <span class="nx">delegate</span> <span class="nx">set</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="nx">bar</span><span class="p">)</span> <span class="nx">to</span> <span class="nx">the</span> <span class="s1">&#39;content&#39;</span> <span class="nx">property</span>
+</span><span class='line'><span class="nx">of</span> <span class="nx">object</span> <span class="nx">proxy</span> <span class="o">&lt;</span><span class="nx">Ember</span><span class="p">.</span><span class="nx">ObjectProxy</span><span class="o">:</span><span class="nx">ember420</span><span class="o">&gt;:</span> <span class="nx">its</span> <span class="s1">&#39;content&#39;</span> <span class="nx">is</span> <span class="kc">undefined</span><span class="p">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I&#8217;ve stumbled upon this in one scenario, where I didn&#8217;t set content for
+my <code>ObjectController</code>, but I tried to modify one of it&#8217;s properties.
+Raising the exception is a good example of failing fast, rather than
+silently swallowing errors.</p>
+
+<p>This being said you should almost always use <code>Ember.ObjectController</code>
+over <code>Ember.Controller</code>, unless you know what you&#8217;re doing :)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[State Manager and Friends]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/01/27/state-manager-and-friends/"/>
+    <updated>2013-01-27T19:23:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/01/27/state-manager-and-friends</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Concatenated Properties]]></title>
@@ -453,82 +553,6 @@ bucket</p>
 </span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">removeFromBucket</span><span class="p">(</span><span class="s1">&#39;clean&#39;</span><span class="p">,</span> <span class="nx">record</span><span class="p">);</span>
 </span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">addToBucket</span><span class="p">(</span><span class="nx">bucketType</span><span class="p">,</span> <span class="nx">record</span><span class="p">);</span>
 </span><span class='line'><span class="p">},</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now let&#8217;s take a look at the source code of <code>transaction.commit()</code>.
-Let&#8217;s pretend that there is nothing about relationship</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">commit</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">store</span> <span class="o">=</span> <span class="nx">get</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&#39;store&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">adapter</span> <span class="o">=</span> <span class="nx">get</span><span class="p">(</span><span class="nx">store</span><span class="p">,</span> <span class="s1">&#39;_adapter&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">defaultTransaction</span> <span class="o">=</span> <span class="nx">get</span><span class="p">(</span><span class="nx">store</span><span class="p">,</span> <span class="s1">&#39;defaultTransaction&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">iterate</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">records</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">set</span> <span class="o">=</span> <span class="nx">records</span><span class="p">.</span><span class="nx">copy</span><span class="p">();</span>
-</span><span class='line'>    <span class="c1">// iterating over all of the given records</span>
-</span><span class='line'>    <span class="nx">set</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">record</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="c1">// send the record to `inFlight` state</span>
-</span><span class='line'>      <span class="nx">record</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;willCommit&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">set</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">relationships</span> <span class="o">=</span> <span class="nx">get</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&#39;relationships&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">commitDetails</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// each bucket is processed separately</span>
-</span><span class='line'>    <span class="nx">created</span><span class="o">:</span> <span class="nx">iterate</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">bucketForType</span><span class="p">(</span><span class="s1">&#39;created&#39;</span><span class="p">)),</span>
-</span><span class='line'>    <span class="nx">updated</span><span class="o">:</span> <span class="nx">iterate</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">bucketForType</span><span class="p">(</span><span class="s1">&#39;updated&#39;</span><span class="p">)),</span>
-</span><span class='line'>    <span class="nx">deleted</span><span class="o">:</span> <span class="nx">iterate</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">bucketForType</span><span class="p">(</span><span class="s1">&#39;deleted&#39;</span><span class="p">)),</span>
-</span><span class='line'>    <span class="nx">relationships</span><span class="o">:</span> <span class="nx">relationships</span>
-</span><span class='line'>  <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="k">this</span> <span class="o">===</span> <span class="nx">defaultTransaction</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">set</span><span class="p">(</span><span class="nx">store</span><span class="p">,</span> <span class="s1">&#39;defaultTransaction&#39;</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">transaction</span><span class="p">());</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">removeCleanRecords</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">commitDetails</span><span class="p">.</span><span class="nx">created</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">()</span> <span class="o">||</span> <span class="o">!</span><span class="nx">commitDetails</span><span class="p">.</span><span class="nx">updated</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">()</span> <span class="o">||</span> <span class="o">!</span><span class="nx">commitDetails</span><span class="p">.</span><span class="nx">deleted</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">()</span> <span class="o">||</span> <span class="o">!</span><span class="nx">relationships</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">())</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">adapter</span> <span class="o">&amp;&amp;</span> <span class="nx">adapter</span><span class="p">.</span><span class="nx">commit</span><span class="p">)</span> <span class="p">{</span> <span class="nx">adapter</span><span class="p">.</span><span class="nx">commit</span><span class="p">(</span><span class="nx">store</span><span class="p">,</span> <span class="nx">commitDetails</span><span class="p">);</span> <span class="p">}</span>
-</span><span class='line'>    <span class="k">else</span> <span class="p">{</span> <span class="k">throw</span> <span class="nx">fmt</span><span class="p">(</span><span class="s2">&quot;Adapter is either null or does not implement `commit` method&quot;</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span> <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
