@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ember | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/ember/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-01-28T00:55:19+01:00</updated>
+  <updated>2013-01-28T21:43:48+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -12,6 +12,131 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[State Manager and Friends - part 1]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/01/27/state-manager-and-friends/"/>
+    <updated>2013-01-27T19:23:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/01/27/state-manager-and-friends</id>
+    <content type="html"><![CDATA[<p>Since state management is such a huge part of Ember.js it desrves a
+dedicated article. I'm not going to explain the old router which used
+<code>Ember.StateManager</code> to do it's bidding. Those days are over and we
+should all be moving towards the v2 router (or v2.2 so to speak).
+Instead we're going to go deep into the <code>Ember.StateManager</code>.</p>
+
+<p>In the general concept, state manager is basically some object which
+manages states and the transitions between them, thus representing a
+finite state machine.</p>
+
+<p>Let's say we have a <code>Post</code> which can be in two states, <code>draft</code> and
+<code>published</code>. It begins it's life as a <code>draft</code> and when we <code>publish</code> it,
+it should send out a notification email. The way Ember would handle this
+is that it would assign a <code>Ember.StateManager</code> instance to the <code>Post</code>
+instance and have that manage it's state (that's not exactly true in
+Ember Data, but we'll get into that).</p>
+
+<p>For now let's just say that this is the code we have</p>
+
+<p>```javascript
+PostManager = Ember.StateManager.extend({
+  states: {</p>
+
+<pre><code>draft: Ember.State.create(),
+published: Ember.State.create()
+</code></pre>
+
+<p>  }
+});</p>
+
+<p>Post = Ember.Object.extend({
+  title: null,
+  init: function() {</p>
+
+<pre><code>this.set("stateManager", PostManager.create());
+this._super();
+</code></pre>
+
+<p>  }
+});
+```</p>
+
+<p>This gives us a really basic implementation. I'm setting the
+<code>stateManager</code> property in the <code>init</code> function to avoid sharing the
+instance across multiple <code>Post</code> instances. I'll explain this in a
+followup article, for now just remember that if you need to set a
+property to an object instance, you have to do that in the <code>init</code>
+function, not directly like <code>stateManager: PostManager.create()</code>.</p>
+
+<p>OK, we are now ready to list all of the states a <code>Post</code> can have.</p>
+
+<p>```javascript
+post = Post.create();
+post.get("stateManager.states"); // => { draft: ..., published: ... }</p>
+
+<p>post.get("stateManager.currentState"); // => null
+```</p>
+
+<p>We forgot to say which of the states should be the default. Let's
+do that.</p>
+
+<p>```javascript
+PostManager = Ember.StateManager.extend({
+  initialState: "draft",
+  states: {</p>
+
+<pre><code>draft: Ember.State.create(),
+published: Ember.State.create()
+</code></pre>
+
+<p>  }
+});
+```</p>
+
+<p>From now every single post we create will be a <code>draft</code></p>
+
+<p><code>javascript
+post = Post.create();
+post.get("stateManager.currentState.name"); // =&gt; "draft"
+</code></p>
+
+<p>And we can also make it transition into another state</p>
+
+<p><code>javascript
+post = Post.create();
+post.get("stateManager").transitionTo("published");
+post.get("stateManager.currentState.name"); // =&gt; "published"
+</code></p>
+
+<p>But <code>Ember.StateManager</code> can do more than that. We can hook into both
+<code>enter</code> and <code>exit</code> events on each state and do some magic! Let's
+redefine our state manager as this</p>
+
+<p>```javascript
+PostManager = Ember.StateManager.extend({
+  initialState: "draft",
+  states: {</p>
+
+<pre><code>draft: Ember.State.create(),
+published: Ember.State.create({
+  enter: function() {
+    console.log("post was published");
+  }
+})
+</code></pre>
+
+<p>  }
+});</p>
+
+<p>post = Post.create();
+post.get("stateManager").transitionTo("published");
+// console prints "post was published"
+```</p>
+
+<p>Understanding how this class works is essential for any Ember developer,
+as it is being used in almost every part of the framework. We'll take at
+some specific examples in the second part of this artcile.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Ember Data in Depth]]></title>

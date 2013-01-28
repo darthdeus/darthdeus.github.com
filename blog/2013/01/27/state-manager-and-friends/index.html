@@ -1,0 +1,442 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>State Manager and Friends - part 1 - darthdeus vs Ember.js</title>
+  <meta name="author" content="Jakub Arnold">
+
+  
+  <meta name="description" content="Since state management is such a huge part of Ember.js it desrves a
+dedicated article. I&#8217;m not going to explain the old router which used
+Ember &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-site-verification" content="BDThfi-RxISwgicQ_eIR6Jc4l13qAi4iAzJmswvhXt4" />
+
+  
+  <link rel="canonical" href="http://darthdeus.github.com/blog/2013/01/27/state-manager-and-friends/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="darthdeus vs Ember.js" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+
+  <a class="github-ribbon" href="http://sensible.io">Available for Hire!</a>
+
+  <header role="banner"><hgroup>
+  <h1><a href="/">darthdeus vs Ember.js</a></h1>
+  
+    <h2>My journey to Ember.js grandmastery</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:darthdeus.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">State Manager and Friends - Part 1</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-27T19:23:00+01:00" pubdate data-updated="true">Jan 27<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Since state management is such a huge part of Ember.js it desrves a
+dedicated article. I&#8217;m not going to explain the old router which used
+<code>Ember.StateManager</code> to do it&#8217;s bidding. Those days are over and we
+should all be moving towards the v2 router (or v2.2 so to speak).
+Instead we&#8217;re going to go deep into the <code>Ember.StateManager</code>.</p>
+
+<p>In the general concept, state manager is basically some object which
+manages states and the transitions between them, thus representing a
+finite state machine.</p>
+
+<p>Let&#8217;s say we have a <code>Post</code> which can be in two states, <code>draft</code> and
+<code>published</code>. It begins it&#8217;s life as a <code>draft</code> and when we <code>publish</code> it,
+it should send out a notification email. The way Ember would handle this
+is that it would assign a <code>Ember.StateManager</code> instance to the <code>Post</code>
+instance and have that manage it&#8217;s state (that&#8217;s not exactly true in
+Ember Data, but we&#8217;ll get into that).</p>
+
+<p>For now let&#8217;s just say that this is the code we have</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">PostManager</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">StateManager</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">states</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">draft</span><span class="o">:</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">create</span><span class="p">(),</span>
+</span><span class='line'>    <span class="nx">published</span><span class="o">:</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Post</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nb">Object</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">title</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;stateManager&quot;</span><span class="p">,</span> <span class="nx">PostManager</span><span class="p">.</span><span class="nx">create</span><span class="p">());</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">_super</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This gives us a really basic implementation. I&#8217;m setting the
+<code>stateManager</code> property in the <code>init</code> function to avoid sharing the
+instance across multiple <code>Post</code> instances. I&#8217;ll explain this in a
+followup article, for now just remember that if you need to set a
+property to an object instance, you have to do that in the <code>init</code>
+function, not directly like <code>stateManager: PostManager.create()</code>.</p>
+
+<p>OK, we are now ready to list all of the states a <code>Post</code> can have.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">post</span> <span class="o">=</span> <span class="nx">Post</span><span class="p">.</span><span class="nx">create</span><span class="p">();</span>
+</span><span class='line'><span class="nx">post</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;stateManager.states&quot;</span><span class="p">);</span> <span class="c1">// =&gt; { draft: ..., published: ... }</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">post</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;stateManager.currentState&quot;</span><span class="p">);</span> <span class="c1">// =&gt; null</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We forgot to say which of the states should be the default. Let&#8217;s
+do that.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">PostManager</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">StateManager</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">initialState</span><span class="o">:</span> <span class="s2">&quot;draft&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">states</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">draft</span><span class="o">:</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">create</span><span class="p">(),</span>
+</span><span class='line'>    <span class="nx">published</span><span class="o">:</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>From now every single post we create will be a <code>draft</code></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">post</span> <span class="o">=</span> <span class="nx">Post</span><span class="p">.</span><span class="nx">create</span><span class="p">();</span>
+</span><span class='line'><span class="nx">post</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;stateManager.currentState.name&quot;</span><span class="p">);</span> <span class="c1">// =&gt; &quot;draft&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And we can also make it transition into another state</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">post</span> <span class="o">=</span> <span class="nx">Post</span><span class="p">.</span><span class="nx">create</span><span class="p">();</span>
+</span><span class='line'><span class="nx">post</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;stateManager&quot;</span><span class="p">).</span><span class="nx">transitionTo</span><span class="p">(</span><span class="s2">&quot;published&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">post</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;stateManager.currentState.name&quot;</span><span class="p">);</span> <span class="c1">// =&gt; &quot;published&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But <code>Ember.StateManager</code> can do more than that. We can hook into both
+<code>enter</code> and <code>exit</code> events on each state and do some magic! Let&#8217;s
+redefine our state manager as this</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">PostManager</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">StateManager</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">initialState</span><span class="o">:</span> <span class="s2">&quot;draft&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">states</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">draft</span><span class="o">:</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">create</span><span class="p">(),</span>
+</span><span class='line'>    <span class="nx">published</span><span class="o">:</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">State</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+</span><span class='line'>      <span class="nx">enter</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;post was published&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">post</span> <span class="o">=</span> <span class="nx">Post</span><span class="p">.</span><span class="nx">create</span><span class="p">();</span>
+</span><span class='line'><span class="nx">post</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;stateManager&quot;</span><span class="p">).</span><span class="nx">transitionTo</span><span class="p">(</span><span class="s2">&quot;published&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="c1">// console prints &quot;post was published&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Understanding how this class works is essential for any Ember developer,
+as it is being used in almost every part of the framework. We&#8217;ll take at
+some specific examples in the second part of this artcile.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jakub Arnold</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-27T19:23:00+01:00" pubdate data-updated="true">Jan 27<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ember/'>Ember</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://darthdeus.github.com/blog/2013/01/27/state-manager-and-friends/" data-via="darthdeus" data-counturl="http://darthdeus.github.com/blog/2013/01/27/state-manager-and-friends/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/01/27/concatenated-properties/" title="Previous Post: Concatenated Properties">&laquo; Concatenated Properties</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2013/01/27/controller-objectcontroller-and-objectproxy/" title="Next Post: Controller, ObjectController and ObjectProxy">Controller, ObjectController and ObjectProxy &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/01/27/controller-objectcontroller-and-objectproxy/">Controller, ObjectController and ObjectProxy</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/27/state-manager-and-friends/">State Manager and Friends - part 1</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/27/concatenated-properties/">Concatenated Properties</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/27/ember-data-in-depth/">Ember Data in Depth</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/27/controllers-needs-explained/">Controller's Needs Explained</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("darthdeus", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/darthdeus" class="twitter-follow-button" data-show-count="false">Follow @darthdeus</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Jakub Arnold -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'darthdeus';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://darthdeus.github.com/blog/2013/01/27/state-manager-and-friends/';
+        var disqus_url = 'http://darthdeus.github.com/blog/2013/01/27/state-manager-and-friends/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+<script type="text/javascript">
+  var _gauges = _gauges || [];
+  (function() {
+    var t   = document.createElement('script');
+    t.type  = 'text/javascript';
+    t.async = true;
+    t.id    = 'gauges-tracker';
+    t.setAttribute('data-site-id', '510566d5613f5d430600000d');
+    t.src = '//secure.gaug.es/track.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(t, s);
+  })();
+</script>
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38013151-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+
+</body>
+</html>
