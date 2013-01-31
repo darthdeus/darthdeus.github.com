@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Data | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/data/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-01-28T22:05:36+01:00</updated>
+  <updated>2013-01-31T23:15:12+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -12,6 +12,97 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to find a model by any attribute in Ember.js]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js/"/>
+    <updated>2013-01-31T23:13:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js</id>
+    <content type="html"><![CDATA[<p>One of the common things people ask about Ember Data is how to find a
+single record by it's attribute. This is because the current revision
+(11) only offers three methods of fetching records</p>
+
+<p><code>javascript
+App.User.find(1) // returns a single user record
+App.User.find({ username: "wycats" }) // returns a ManyArray
+App.User.findQuery({ username: "wycats" }) // same as the above
+</code></p>
+
+<p>If you want to search for a user by his username, you have two options</p>
+
+<h2>Using .find with <em>smart</em> server side</h2>
+
+<p>The way <code>App.User.find(1)</code> works is that it does a request to
+<code>/users/1</code>, which is expected to return just one record.</p>
+
+<p>You could modify your server to accept both <code>username</code> and <code>id</code> on the
+<code>/users/1</code> path, which would allow to do <code>App.User.find("wycats")</code>.</p>
+
+<p>There's an issue with this though. If you load the same user via his
+<code>username</code> and <code>id</code>, you'll end up with two records stored in the Ember
+identity map.</p>
+
+<p>Which basically means that if you try to retrieve all of the user
+records, you will end up with that one user twice.</p>
+
+<p>If you want to read more about this, <a href="https://github.com/emberjs/data/issues/571">checkout this GitHub
+issue</a></p>
+
+<h2>Using a findQuery</h2>
+
+<p>This might not seem like the right solution at first, since it returns a
+<code>DS.ManyArray</code> instead of just one record, but hang on.</p>
+
+<p><code>DS.ManyArray</code> is a subclass of <code>DS.RecordArray</code>, which includes a
+<code>DS.LoadPromise</code>.</p>
+
+<p>To understand how <code>DS.LoadPromise</code> works, we need to understand what
+promises are. <a href="https://gist.github.com/3889970">There's a great article about
+that</a>, so I won't go into much detail.</p>
+
+<p>Promise is basically an async monad (I guess that doesn't help, let's
+try again).</p>
+
+<p>Promise is something which allows you to return an object which wraps
+around a value, even if you don't have the value yet. For example if
+you're doing <code>App.User.findQuery</code>, you'll get back an empty
+<code>DS.ManyArray</code> instantly.</p>
+
+<p>It doesn't wait until the AJAX request is finished, it just returns the
+empty array, which is populated with the data once the request finishes.</p>
+
+<p>This works because Ember uses data bindings and will automagically
+update all of the views once the data is loaded. And also because the
+router will wait if it's model has a state <code>isLoading</code>. That way you
+won't display a page which is half loaded.</p>
+
+<h2>Implementation</h2>
+
+<p>Now that we know we're getting a <code>DS.ManyArray</code>, we need to figure out a
+way to make it represent only the value of it's first element, because
+that's what we care about.</p>
+
+<p>```javascript
+var users = App.User.findQuery({ username: username });</p>
+
+<p>users.one("didLoad", function() {
+  users.resolve(users.get("firstObject"));
+});</p>
+
+<p>return users;
+```</p>
+
+<p>You can see that we are returning the result of the <code>findQuery</code>
+instantly, but we're also setting an asynchronous callback which
+<strong>resolves the promise</strong> to the <code>firstObject</code> once it is loaded.</p>
+
+<p>Another way you could read the <code>resolve(x)</code> is <em>from now you're
+representing value <code>x</code></em>. Using this technique will work in all Ember,
+because the data bindings will take care of everything. Always remember
+that you don't need to worry about re-rendering your views, just change
+the data and Ember will take care of the rest.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Ember Data in Depth]]></title>
