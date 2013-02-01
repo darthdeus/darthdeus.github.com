@@ -4,7 +4,7 @@
   <title><![CDATA[darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-01-31T23:15:12+01:00</updated>
+  <updated>2013-02-01T20:24:02+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -12,6 +12,271 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ember.js Router and Template Naming Convention]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention/"/>
+    <updated>2013-02-01T19:43:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention</id>
+    <content type="html"><![CDATA[<p>Ever since the change to <code>resource</code> and <code>route</code> a lot of people are
+confused about the meaning of the two and how they affect naming. Here&#8217;s
+the difference:</p>
+
+<ul>
+<li><code>resource</code> - a thing</li>
+<li><code>route</code> - something to do with the thing</li>
+</ul>
+
+
+<p>Let&#8217;s say we have a model <code>App.Post</code> and we want to show a list of posts
+and a new post form. There are many ways you can go about this, so let&#8217;s
+start with the simplest.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">resource</span><span class="p">(</span><span class="s2">&quot;posts&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/&quot;</span> <span class="p">});</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">route</span><span class="p">(</span><span class="s2">&quot;new&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/new&quot;</span> <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This would result in the following template structure</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/x-handlebars&quot;</span> <span class="na">data-template-name=</span><span class="s">&quot;posts&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="p">...</span> <span class="nx">list</span> <span class="nx">the</span> <span class="nx">posts</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/x-handlebars&quot;</span> <span class="na">data-template-name=</span><span class="s">&quot;new&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="p">...</span> <span class="k">new</span> <span class="nx">post</span> <span class="nx">template</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With the following naming</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">PostsRoute</span>
+</span><span class='line'><span class="nx">PostsController</span>
+</span><span class='line'><span class="nx">PostsView</span>
+</span><span class='line'><span class="nx">NewRoute</span>
+</span><span class='line'><span class="nx">NewController</span>
+</span><span class='line'><span class="nx">NewView</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://jsbin.com/ogorab/33/edit">Here&#8217;s a JSBin</a></p>
+
+<p>This is almost never useful, since you might have many <code>/new</code> actions
+and you&#8217;d need to scope them to the resource, which would be done as
+follows</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">resource</span><span class="p">(</span><span class="s2">&quot;posts&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/&quot;</span> <span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">route</span><span class="p">(</span><span class="s2">&quot;new&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/new&quot;</span> <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here things get a little more complicated, since we&#8217;re nesting something
+inside the resource. This means that we&#8217;ll end up with three templates
+instead of two</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/x-handlebars&quot;</span> <span class="na">data-template-name=</span><span class="s">&quot;posts&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">This</span> <span class="nx">is</span> <span class="nx">the</span> <span class="nx">outlet</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p"></span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/x-handlebars&quot;</span> <span class="na">data-template-name=</span><span class="s">&quot;posts/index&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="p">...</span> <span class="nx">list</span> <span class="nx">the</span> <span class="nx">posts</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/x-handlebars&quot;</span> <span class="na">data-template-name=</span><span class="s">&quot;posts/new&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="p">...</span> <span class="k">new</span> <span class="nx">post</span> <span class="nx">template</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With the following naming</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">PostsRoute</span>
+</span><span class='line'><span class="nx">PostsController</span>
+</span><span class='line'><span class="nx">PostsView</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">PostsIndexRoute</span>
+</span><span class='line'><span class="nx">PostsIndexController</span>
+</span><span class='line'><span class="nx">PostsIndexView</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">PostsNewRoute</span>
+</span><span class='line'><span class="nx">PostsNewController</span>
+</span><span class='line'><span class="nx">PostsNewView</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://jsbin.com/ogorab/34/edit">Here&#8217;s a JSBin</a></p>
+
+<p>This means whenever you create a resource it will create a brand new
+namespace. That namespace will have an &#8220; which is named after the
+resource and all of the child routes will be inserted into it.</p>
+
+<p>There are many reasons behind it, but let&#8217;s try another example which
+will make it more obvious. We will add a <code>/:post_id</code> and
+<code>/:post_id/edit</code> routes.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">resource</span><span class="p">(</span><span class="s2">&quot;posts&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/&quot;</span> <span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">resource</span><span class="p">(</span><span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/:post_id&quot;</span> <span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">route</span><span class="p">(</span><span class="s2">&quot;edit&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/edit&quot;</span> <span class="p">});</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">route</span><span class="p">(</span><span class="s2">&quot;new&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/new&quot;</span> <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Additional to the routes in the previous example, this will give us</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// IMPORTANT - it&#39;s not PostsPostRoute, because `resource`</span>
+</span><span class='line'><span class="c1">// always creates a new namespace</span>
+</span><span class='line'><span class="nx">PostRoute</span>
+</span><span class='line'><span class="nx">PostController</span>
+</span><span class='line'><span class="nx">PostView</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">PostIndexRoute</span>
+</span><span class='line'><span class="nx">PostIndexController</span>
+</span><span class='line'><span class="nx">PostIndexView</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">PostEditRoute</span>
+</span><span class='line'><span class="nx">PostEditController</span>
+</span><span class='line'><span class="nx">PostEditView</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Templates are named accordingly <code>post</code>, <code>post.index</code> and <code>post.edit</code>,
+<strong>there is nothing like <code>posts.post.index</code> or <code>posts.post</code> or
+<code>posts.post.edit</code></strong>.</p>
+
+<p><a href="http://jsbin.com/ogorab/35/edit">Here&#8217;s a JSBin</a></p>
+
+<p>But the problem is when we try to access the <code>App.Post</code> model from the
+<code>post/index</code> or <code>post/edit</code> template. It is only available in the <code>post</code>
+template with the outlet. Now why is that?</p>
+
+<p>Since we are defining a <code>resource</code> it is expected that the child routes
+will be related to that <code>resource</code>, that&#8217;s why they don&#8217;t need to load
+it separately. They can access it from the parent <code>PostController</code> via
+<code>needs</code> (<a href="http://darthdeus.github.com/blog/2013/01/27/controllers-needs-explained/">more about that can be found in this article</a></p>
+
+<p><a href="http://jsbin.com/ogorab/37/edit">Here&#8217;s a JSBin</a></p>
+
+<p>This is the general pattern you would be using if you want to nest
+everything. But what if you don&#8217;t want to render <code>post</code> into the
+<code>posts</code> outlet? Well nothing prevents you from defining the routes as
+this.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">resource</span><span class="p">(</span><span class="s2">&quot;posts&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/&quot;</span> <span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">route</span><span class="p">(</span><span class="s2">&quot;new&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/new&quot;</span> <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">resource</span><span class="p">(</span><span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/:post_id&quot;</span> <span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">route</span><span class="p">(</span><span class="s2">&quot;edit&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/edit&quot;</span> <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What is the difference? The naming remains exactly the same as in the
+previous example, even templates are named the same. But the <code>post</code>
+template will be inserted into the <code>application</code> layout, not inside the
+<code>posts</code> layout. This is the case when you want the detail <code>post</code> page to
+replace the whole layout, instead of just showing it together with the
+<code>posts</code> list.</p>
+
+<p>I hope the examples will help you understanding how the v2 routes work,
+since this is a completely essential part of Ember.js.</p>
+
+<p>If you have any questions, leave them in the comments or tweet me
+<a href="http://twitter.com/darthdeus">@darthdeus</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to find a model by any attribute in Ember.js]]></title>

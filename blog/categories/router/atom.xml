@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Router | darthdeus vs Ember.js]]></title>
+  <link href="http://darthdeus.github.com/blog/categories/router/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.com/"/>
+  <updated>2013-02-01T20:24:02+01:00</updated>
+  <id>http://darthdeus.github.com/</id>
+  <author>
+    <name><![CDATA[Jakub Arnold]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Ember.js Router and Template Naming Convention]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention/"/>
+    <updated>2013-02-01T19:43:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention</id>
+    <content type="html"><![CDATA[<p>Ever since the change to <code>resource</code> and <code>route</code> a lot of people are
+confused about the meaning of the two and how they affect naming. Here's
+the difference:</p>
+
+<ul>
+<li><code>resource</code> - a thing</li>
+<li><code>route</code> - something to do with the thing</li>
+</ul>
+
+
+<p>Let's say we have a model <code>App.Post</code> and we want to show a list of posts
+and a new post form. There are many ways you can go about this, so let's
+start with the simplest.</p>
+
+<p><code>javascript
+App.Router.map(function() {
+  this.resource("posts", { path: "/" });
+  this.route("new", { path: "/new" });
+});
+</code></p>
+
+<p>This would result in the following template structure</p>
+
+<p>```html</p>
+
+<script type="text/x-handlebars" data-template-name="posts">
+  ... list the posts
+</script>
+
+
+
+
+<script type="text/x-handlebars" data-template-name="new">
+  ... new post template
+</script>
+
+
+<p>```</p>
+
+<p>With the following naming</p>
+
+<p><code>javascript
+PostsRoute
+PostsController
+PostsView
+NewRoute
+NewController
+NewView
+</code></p>
+
+<p><a href="http://jsbin.com/ogorab/33/edit">Here's a JSBin</a></p>
+
+<p>This is almost never useful, since you might have many <code>/new</code> actions
+and you'd need to scope them to the resource, which would be done as
+follows</p>
+
+<p>```javascript
+App.Router.map(function() {
+  this.resource("posts", { path: "/" }, function() {</p>
+
+<pre><code>this.route("new", { path: "/new" });
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>Here things get a little more complicated, since we're nesting something
+inside the resource. This means that we'll end up with three templates
+instead of two</p>
+
+<p>```html</p>
+
+<script type="text/x-handlebars" data-template-name="posts">
+  <h1>This is the outlet</h1>
+
+  
+</script>
+
+
+
+
+<script type="text/x-handlebars" data-template-name="posts/index">
+  ... list the posts
+</script>
+
+
+
+
+<script type="text/x-handlebars" data-template-name="posts/new">
+  ... new post template
+</script>
+
+
+<p>```</p>
+
+<p>With the following naming</p>
+
+<p>```javascript
+PostsRoute
+PostsController
+PostsView</p>
+
+<p>PostsIndexRoute
+PostsIndexController
+PostsIndexView</p>
+
+<p>PostsNewRoute
+PostsNewController
+PostsNewView
+```</p>
+
+<p><a href="http://jsbin.com/ogorab/34/edit">Here's a JSBin</a></p>
+
+<p>This means whenever you create a resource it will create a brand new
+namespace. That namespace will have an <code></code> which is named after the
+resource and all of the child routes will be inserted into it.</p>
+
+<p>There are many reasons behind it, but let's try another example which
+will make it more obvious. We will add a <code>/:post_id</code> and
+<code>/:post_id/edit</code> routes.</p>
+
+<p>```javascript
+App.Router.map(function() {
+  this.resource("posts", { path: "/" }, function() {</p>
+
+<pre><code>this.resource("post", { path: "/:post_id" }, function() {
+  this.route("edit", { path: "/edit" });
+});
+
+this.route("new", { path: "/new" });
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>Additional to the routes in the previous example, this will give us</p>
+
+<p><code>``javascript
+// IMPORTANT - it's not PostsPostRoute, because</code>resource`
+// always creates a new namespace
+PostRoute
+PostController
+PostView</p>
+
+<p>PostIndexRoute
+PostIndexController
+PostIndexView</p>
+
+<p>PostEditRoute
+PostEditController
+PostEditView
+```</p>
+
+<p>Templates are named accordingly <code>post</code>, <code>post.index</code> and <code>post.edit</code>,
+<strong>there is nothing like <code>posts.post.index</code> or <code>posts.post</code> or
+<code>posts.post.edit</code></strong>.</p>
+
+<p><a href="http://jsbin.com/ogorab/35/edit">Here's a JSBin</a></p>
+
+<p>But the problem is when we try to access the <code>App.Post</code> model from the
+<code>post/index</code> or <code>post/edit</code> template. It is only available in the <code>post</code>
+template with the outlet. Now why is that?</p>
+
+<p>Since we are defining a <code>resource</code> it is expected that the child routes
+will be related to that <code>resource</code>, that's why they don't need to load
+it separately. They can access it from the parent <code>PostController</code> via
+<code>needs</code> (<a href="http://darthdeus.github.com/blog/2013/01/27/controllers-needs-explained/">more about that can be found in this article</a></p>
+
+<p><a href="http://jsbin.com/ogorab/37/edit">Here's a JSBin</a></p>
+
+<p>This is the general pattern you would be using if you want to nest
+everything. But what if you don't want to render <code>post</code> into the
+<code>posts</code> outlet? Well nothing prevents you from defining the routes as
+this.</p>
+
+<p>```javascript
+App.Router.map(function() {
+  this.resource("posts", { path: "/" }, function() {</p>
+
+<pre><code>this.route("new", { path: "/new" });
+</code></pre>
+
+<p>  });</p>
+
+<p>  this.resource("post", { path: "/:post_id" }, function() {</p>
+
+<pre><code>this.route("edit", { path: "/edit" });
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>What is the difference? The naming remains exactly the same as in the
+previous example, even templates are named the same. But the <code>post</code>
+template will be inserted into the <code>application</code> layout, not inside the
+<code>posts</code> layout. This is the case when you want the detail <code>post</code> page to
+replace the whole layout, instead of just showing it together with the
+<code>posts</code> list.</p>
+
+<p>I hope the examples will help you understanding how the v2 routes work,
+since this is a completely essential part of Ember.js.</p>
+
+<p>If you have any questions, leave them in the comments or tweet me
+<a href="http://twitter.com/darthdeus">@darthdeus</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>
