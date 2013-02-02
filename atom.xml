@@ -4,7 +4,7 @@
   <title><![CDATA[darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-02T15:47:42+01:00</updated>
+  <updated>2013-02-02T15:55:07+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -18,8 +18,7 @@
     <link href="http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data/"/>
     <updated>2013-02-02T14:15:00+01:00</updated>
     <id>http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data</id>
-    <content type="html"><![CDATA[<p>We talked about transactions in <a href="http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/">one of the previous
-articles</a>
+    <content type="html"><![CDATA[<p>We talked about transactions in <a href="http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/">one of the previous articles</a>
 (read it if you haven&#8217;t already), but we didn&#8217;t really touch on when to
 use them in real world. One of the most common use cases for me is when
 I just want to manage a single record while there are many changes
