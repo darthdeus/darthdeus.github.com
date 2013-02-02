@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Data | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/data/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-02T11:27:44+01:00</updated>
+  <updated>2013-02-02T15:47:42+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -12,6 +12,82 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using Transactions in Ember Data - part 1]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data/"/>
+    <updated>2013-02-02T14:15:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data</id>
+    <content type="html"><![CDATA[<p>We talked about transactions in <a href="http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/">one of the previous
+articles</a>
+(read it if you haven't already), but we didn't really touch on when to
+use them in real world. One of the most common use cases for me is when
+I just want to manage a single record while there are many changes
+happening on the page.</p>
+
+<p>Adding a record to a transaction is simple</p>
+
+<p>```javascript
+// say that we are in a controller
+store = this.get("store");</p>
+
+<p>// this ALWAYS returns a new transaction
+transaction = store.transaction();</p>
+
+<p>user = App.User.find(1);
+transaction.add(user);</p>
+
+<p>transaction.toString(); // => "&lt;DS.Transaction:ember955>"
+```</p>
+
+<p>Now this is obvious, but what if we need to commit the transaction in a
+completely different action? Do we need to store the instance somewhere
+to use it later?</p>
+
+<p>The answer is NO, we can always return the transaction in which the
+record is by calling <code>.get("transaction")</code>. We can even do it if we
+decide to fetch the user again in a completely different part of the
+application.</p>
+
+<p><code>javascript
+user = App.User.find(1);
+user.get("transaction").toString(); // =&gt; "&lt;DS.Transaction:ember955&gt;"
+</code></p>
+
+<p>It doesn't matter in which part of the application you add the record to
+a transaction because you can always retrieve the correct instance
+later.</p>
+
+<p>Which allows us to do something like this:</p>
+
+<p>```javascript
+App.UsersNewRoute = Ember.Route.extend({
+  model: function() {</p>
+
+<pre><code>var transaction = this.get("store").transaction();
+
+var user = transaction.createRecord(App.User, {});
+return user;
+</code></pre>
+
+<p>  },</p>
+
+<p>  events: {</p>
+
+<pre><code>createUser: function(user) {
+  user.get("transaction").commit();
+}
+</code></pre>
+
+<p>  }
+});
+```</p>
+
+<p>Personally I use this when I only care about one record, but I know that
+there might be other which are <code>dirty</code> and I don't want to commit those.
+This happens almost every time you have two forms displayed at once.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to find a model by any attribute in Ember.js]]></title>

@@ -5,13 +5,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Controller, ObjectController and ObjectProxy - darthdeus vs Ember.js</title>
+  <title>Using Transactions in Ember Data - part 1 - darthdeus vs Ember.js</title>
   <meta name="author" content="Jakub Arnold">
 
   
-  <meta name="description" content="When you first come to Ember, you&#8217;ll soon stumble upon three things: Ember.Controller
-Ember.ObjectController
-Ember.ArrayController For some &hellip;">
+  <meta name="description" content="We talked about transactions in one of the previous
+articles
+(read it if you haven&#8217;t already), but we didn&#8217;t really touch on when to
+use &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +22,7 @@ Ember.ArrayController For some &hellip;">
   <meta name="google-site-verification" content="BDThfi-RxISwgicQ_eIR6Jc4l13qAi4iAzJmswvhXt4" />
 
   
-  <link rel="canonical" href="http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy/">
+  <link rel="canonical" href="http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -76,7 +77,7 @@ Ember.ArrayController For some &hellip;">
   <header>
     
       
-        <h1 class="entry-title">Controller, ObjectController and ObjectProxy</h1>
+        <h1 class="entry-title">Using Transactions in Ember Data - Part 1</h1>
       
     
     
@@ -93,30 +94,66 @@ Ember.ArrayController For some &hellip;">
   
 
 
-<time datetime="2013-01-27T19:24:00+01:00" pubdate data-updated="true">Jan 27<span>th</span>, 2013</time>
+<time datetime="2013-02-02T14:15:00+01:00" pubdate data-updated="true">Feb 2<span>nd</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>When you first come to Ember, you&#8217;ll soon stumble upon three things:</p>
+<div class="entry-content"><p>We talked about transactions in <a href="http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/">one of the previous
+articles</a>
+(read it if you haven&#8217;t already), but we didn&#8217;t really touch on when to
+use them in real world. One of the most common use cases for me is when
+I just want to manage a single record while there are many changes
+happening on the page.</p>
 
-<ul>
-<li><code>Ember.Controller</code></li>
-<li><code>Ember.ObjectController</code></li>
-<li><code>Ember.ArrayController</code></li>
-</ul>
+<p>Adding a record to a transaction is simple</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// say that we are in a controller</span>
+</span><span class='line'><span class="nx">store</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;store&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// this ALWAYS returns a new transaction</span>
+</span><span class='line'><span class="nx">transaction</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">transaction</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">user</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span> <span class="c1">// =&gt; &quot;&lt;DS.Transaction:ember955&gt;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<p>For some people (including me) it is not very clear what&#8217;s the
-difference between the first two.</p>
+<p>Now this is obvious, but what if we need to commit the transaction in a
+completely different action? Do we need to store the instance somewhere
+to use it later?</p>
 
-<p><code>Ember.Controller</code> is just a plain implementation of
-<code>Ember.ControllerMixin</code>, while <code>Ember.ObjectController</code> is a subclass of
-<code>Ember.ObjectProxy</code>. This is a huge difference! Let&#8217;s take a look at how
-<code>Ember.ObjectProxy</code> works, and as always starting with a code sample
-(<a href="https://github.com/emberjs/ember.js/blob/master/packages/ember-runtime/lib/system/object_proxy.js#L35-L50">taken from the excellent source code documentation</a>).</p>
+<p>The answer is NO, we can always return the transaction in which the
+record is by calling <code>.get("transaction")</code>. We can even do it if we
+decide to fetch the user again in a completely different part of the
+application.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">user</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">).</span><span class="nx">toString</span><span class="p">();</span> <span class="c1">// =&gt; &quot;&lt;DS.Transaction:ember955&gt;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It doesn&#8217;t matter in which part of the application you add the record to
+a transaction because you can always retrieve the correct instance
+later.</p>
+
+<p>Which allows us to do something like this:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -132,57 +169,26 @@ difference between the first two.</p>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">object</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;foo&quot;</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">UsersNewRoute</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Route</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">model</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">transaction</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;store&quot;</span><span class="p">).</span><span class="nx">transaction</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">transaction</span><span class="p">.</span><span class="nx">createRecord</span><span class="p">(</span><span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">,</span> <span class="p">{});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">user</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">events</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">createUser</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">).</span><span class="nx">commit</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
 </span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">proxy</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">ObjectProxy</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">content</span><span class="o">:</span> <span class="nx">object</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Access and change existing properties</span>
-</span><span class='line'><span class="nx">proxy</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="c1">// =&gt; &quot;foo&quot;</span>
-</span><span class='line'><span class="nx">proxy</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">object</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="c1">// =&gt; &quot;bar&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Create new &quot;description&quot; property on `object`</span>
-</span><span class='line'><span class="nx">proxy</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;baz&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">object</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">)</span> <span class="c1">// =&gt; &quot;baz&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>There is really no magic. In the basic usage, <code>Ember.ObjectProxy</code> will
-delegate all of it&#8217;s unknown properties to the <code>content</code> object, with
-one exception.</p>
-
-<p>If we try to set a new property on a proxy while it&#8217;s content is
-undefined, we will get an exception.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">proxy</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">ObjectProxy</span><span class="p">.</span><span class="nx">create</span><span class="p">();</span>
-</span><span class='line'><span class="nx">proxy</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">);</span> <span class="c1">// raises the following exception</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">Cannot</span> <span class="nx">delegate</span> <span class="nx">set</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="nx">bar</span><span class="p">)</span> <span class="nx">to</span> <span class="nx">the</span> <span class="s1">&#39;content&#39;</span> <span class="nx">property</span>
-</span><span class='line'><span class="nx">of</span> <span class="nx">object</span> <span class="nx">proxy</span> <span class="o">&lt;</span><span class="nx">Ember</span><span class="p">.</span><span class="nx">ObjectProxy</span><span class="o">:</span><span class="nx">ember420</span><span class="o">&gt;:</span> <span class="nx">its</span> <span class="s1">&#39;content&#39;</span> <span class="nx">is</span> <span class="kc">undefined</span><span class="p">.</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I&#8217;ve stumbled upon this in one scenario, where I didn&#8217;t set content for
-my <code>ObjectController</code>, but I tried to modify one of it&#8217;s properties.
-Raising the exception is a good example of failing fast, rather than
-silently swallowing errors.</p>
-
-<p>This being said you should almost always use <code>Ember.ObjectController</code>
-over <code>Ember.Controller</code>, unless you know what you&#8217;re doing :)</p>
+<p>Personally I use this when I only care about one record, but I know that
+there might be other which are <code>dirty</code> and I don&#8217;t want to commit those.
+This happens almost every time you have two forms displayed at once.</p>
 </div>
 
 
@@ -205,12 +211,12 @@ over <code>Ember.Controller</code>, unless you know what you&#8217;re doing :)</
   
 
 
-<time datetime="2013-01-27T19:24:00+01:00" pubdate data-updated="true">Jan 27<span>th</span>, 2013</time>
+<time datetime="2013-02-02T14:15:00+01:00" pubdate data-updated="true">Feb 2<span>nd</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/controller/'>controller</a>
+    <a class='category' href='/blog/categories/data/'>Data</a>, <a class='category' href='/blog/categories/transactions/'>Transactions</a>
   
 </span>
 
@@ -219,7 +225,7 @@ over <code>Ember.Controller</code>, unless you know what you&#8217;re doing :)</
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy/" data-via="darthdeus" data-counturl="http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data/" data-via="darthdeus" data-counturl="http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data/" >Tweet</a>
   
   
   
@@ -228,10 +234,8 @@ over <code>Ember.Controller</code>, unless you know what you&#8217;re doing :)</
     
     <p class="meta">
       
-        <a class="basic-alignment left articlenav" href="/blog/2013/01/27/state-manager-and-friends/" title="Previous Post: State Manager and Friends - part 1">&laquo; State Manager and Friends - part 1</a>
+        <a class="basic-alignment left articlenav" href="/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention/" title="Previous Post: Ember.js Router and Template Naming Convention">&laquo; Ember.js Router and Template Naming Convention</a>
       
-      
-        <a class="basic-alignment right articlenav" href="/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js/" title="Next Post: How to find a model by any attribute in Ember.js">How to find a model by any attribute in Ember.js &raquo;</a>
       
     </p>
   </footer>
@@ -314,8 +318,8 @@ over <code>Ember.Controller</code>, unless you know what you&#8217;re doing :)</
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy/';
-        var disqus_url = 'http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy/';
+        var disqus_identifier = 'http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data/';
+        var disqus_url = 'http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data/';
         var disqus_script = 'embed.js';
       
     (function () {

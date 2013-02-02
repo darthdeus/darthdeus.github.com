@@ -4,7 +4,7 @@
   <title><![CDATA[darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-02T11:27:44+01:00</updated>
+  <updated>2013-02-02T15:47:42+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -12,6 +12,102 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using Transactions in Ember Data - part 1]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data/"/>
+    <updated>2013-02-02T14:15:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data</id>
+    <content type="html"><![CDATA[<p>We talked about transactions in <a href="http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/">one of the previous
+articles</a>
+(read it if you haven&#8217;t already), but we didn&#8217;t really touch on when to
+use them in real world. One of the most common use cases for me is when
+I just want to manage a single record while there are many changes
+happening on the page.</p>
+
+<p>Adding a record to a transaction is simple</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// say that we are in a controller</span>
+</span><span class='line'><span class="nx">store</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;store&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// this ALWAYS returns a new transaction</span>
+</span><span class='line'><span class="nx">transaction</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">transaction</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">user</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span> <span class="c1">// =&gt; &quot;&lt;DS.Transaction:ember955&gt;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now this is obvious, but what if we need to commit the transaction in a
+completely different action? Do we need to store the instance somewhere
+to use it later?</p>
+
+<p>The answer is NO, we can always return the transaction in which the
+record is by calling <code>.get("transaction")</code>. We can even do it if we
+decide to fetch the user again in a completely different part of the
+application.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">user</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">).</span><span class="nx">toString</span><span class="p">();</span> <span class="c1">// =&gt; &quot;&lt;DS.Transaction:ember955&gt;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It doesn&#8217;t matter in which part of the application you add the record to
+a transaction because you can always retrieve the correct instance
+later.</p>
+
+<p>Which allows us to do something like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">UsersNewRoute</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Route</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">model</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">transaction</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;store&quot;</span><span class="p">).</span><span class="nx">transaction</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">transaction</span><span class="p">.</span><span class="nx">createRecord</span><span class="p">(</span><span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">,</span> <span class="p">{});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">user</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">events</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">createUser</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">).</span><span class="nx">commit</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Personally I use this when I only care about one record, but I know that
+there might be other which are <code>dirty</code> and I don&#8217;t want to commit those.
+This happens almost every time you have two forms displayed at once.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Ember.js Router and Template Naming Convention]]></title>
