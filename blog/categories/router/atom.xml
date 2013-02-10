@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Router | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/router/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-10T21:48:14+01:00</updated>
+  <updated>2013-02-10T22:51:48+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -174,7 +174,7 @@ App.PostRoute = App.Route.extend({</p>
 
 <p>This is the place where you can chose to render into other outlets. For
 example let's say that your <code>application</code> template has a sidebar outlet
-<code>{{outlet sidebar}}</code>.</p>
+<code></code>.</p>
 
 <p>```javascript
 App.PostRoute = App.Route.extend({</p>
@@ -308,7 +308,7 @@ instead of two</p>
 <script type="text/x-handlebars" data-template-name="posts">
   <h1>This is the outlet</h1>
 
-  {{outlet}}
+  
 </script>
 
 
@@ -347,7 +347,7 @@ PostsNewView
 <p><a href="http://jsbin.com/ogorab/34/edit">Here's a JSBin</a></p>
 
 <p>This means whenever you create a resource it will create a brand new
-namespace. That namespace will have an <code>{{outlet}}</code> which is named after the
+namespace. That namespace will have an <code></code> which is named after the
 resource and all of the child routes will be inserted into it.</p>
 
 <p>There are many reasons behind it, but let's try another example which

@@ -9,9 +9,8 @@
   <meta name="author" content="Jakub Arnold">
 
   
-  <meta name="description" content="Router is the core part of Ember. Every time we go to a new URL it means
-the
-route object is called with our params and stuff. These are the hooks &hellip;">
+  <meta name="description" content="There are many ways one can DRY up templates when using Ember.js, it all
+depends on what you&#8217;re trying to achieve. partial &amp;&amp; template &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +71,86 @@ route object is called with our params and stuff. These are the hooks &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/02/10/render/">Render, Control, Partial, View, Template</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-10T21:29:00+01:00" pubdate data-updated="true">Feb 10<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>There are many ways one can DRY up templates when using Ember.js, it all
+depends on what you&#8217;re trying to achieve.</p>
+
+<h2>partial &amp;&amp; template</h2>
+
+<p><code>{{partial "foo"}}</code> will take a template
+<code>foo.handlebars</code> and insert it without changing anything, which is
+exactly the same as in Rails. There are no views created, no scope
+changes, it just inserts the template right there.</p>
+
+<p><code>{{template}}</code> isn&#8217;t really meant to be used anymore, so use
+<code>{{partial}}</code> instead.</p>
+
+<h2>view</h2>
+
+<p><code>{{view App.FooView}}</code> will create an instance of
+<code>App.FooView</code> (with <code>foo.handlebars</code> template unless you override the
+name) and insert it in place. You can bind on properties of the view,
+such as <code>{{view App.FooView contentBinding="foobar"}}{% endraw
+%}</code>, or just specify a property directly <code>{% raw %}{{view App.FooView
+class="foobar"}}</code>.</p>
+
+<p>This is a low level thing and is mostly used to instantiate simple
+views, such as <code>{{view Ember.TextField valueBinding="name" class="username"}}</code></p>
+
+<h2>render &amp;&amp; control</h2>
+
+<p>Most of the time you&#8217;re looking to use <code>{{render}}</code> instead of
+<code>{{view}}</code> as it offers better means of
+abstraction. <code>{{render "foo" bar}}</code> will create a
+<code>App.FooController</code> and bind it&#8217;s content to <code>bar</code>.  It also creates a
+<code>App.FooView</code> and renders a <code>foo</code> template.</p>
+
+<p>One drawback is that <code>{{render}}</code> <strong>can not be called multiple times on
+a single route</strong>. If you need a self sustainable widget which can be
+created any number of times you want, you&#8217;re looking for <code>{{control}}</code>
+which has exactly the same effect as <code>{{render}}</code>, but it will have a new
+controller instance every time you call it, while <code>{{render}w</code> uses a
+singleton controller.</p>
+
+<p>Please keep in mind that <code>{{control}}</code> is currently under heavy
+development and will probably change soon, because of the high number of
+issues there are with it.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1889,6 +1968,10 @@ That&#8217;s where needs come in.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/02/10/render/">render, control, partial, view, template</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/02/08/router-request-lifecycle/">Router Request Lifecycle</a>
       </li>
     
@@ -1902,10 +1985,6 @@ That&#8217;s where needs come in.</p>
     
       <li class="post">
         <a href="/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js/">How to find a model by any attribute in Ember.js</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/27/controller-objectcontroller-and-objectproxy/">Controller, ObjectController and ObjectProxy</a>
       </li>
     
   </ul>

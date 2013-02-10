@@ -5,13 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Blog Archive - darthdeus vs Ember.js</title>
+  <title>render, control, partial, view, template - darthdeus vs Ember.js</title>
   <meta name="author" content="Jakub Arnold">
 
   
-  <meta name="description" content="Blog Archive 2013 render, control, partial, view, template
-Feb 10 2013 posted in Templates Router Request Lifecycle
-Feb 08 2013 posted in Router &hellip;">
+  <meta name="description" content="There are many ways one can DRY up templates when using Ember.js, it all
+depends on what you&#8217;re trying to achieve. partial &amp;&amp; template &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +20,7 @@ Feb 08 2013 posted in Router &hellip;">
   <meta name="google-site-verification" content="BDThfi-RxISwgicQ_eIR6Jc4l13qAi4iAzJmswvhXt4" />
 
   
-  <link rel="canonical" href="http://darthdeus.github.com/blog/archives/">
+  <link rel="canonical" href="http://darthdeus.github.com/blog/2013/02/10/render/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -71,162 +70,135 @@ Feb 08 2013 posted in Router &hellip;">
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Blog Archive</h1>
+    
+      
+        <h1 class="entry-title">Render, Control, Partial, View, Template</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-10T21:29:00+01:00" pubdate data-updated="true">Feb 10<span>th</span>, 2013</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives">
 
 
+<div class="entry-content"><p>There are many ways one can DRY up templates when using Ember.js, it all
+depends on what you&#8217;re trying to achieve.</p>
 
-  
-  <h2>2013</h2>
+<h2>partial &amp;&amp; template</h2>
 
-<article>
-  
-<h1><a href="/blog/2013/02/10/render/">render, control, partial, view, template</a></h1>
-<time datetime="2013-02-10T21:29:00+01:00" pubdate><span class='month'>Feb</span> <span class='day'>10</span> <span class='year'>2013</span></time>
+<p><code>{{partial "foo"}}</code> will take a template
+<code>foo.handlebars</code> and insert it without changing anything, which is
+exactly the same as in Rails. There are no views created, no scope
+changes, it just inserts the template right there.</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/templates/'>Templates</a></span>
-</footer>
+<p><code>{{template}}</code> isn&#8217;t really meant to be used anymore, so use
+<code>{{partial}}</code> instead.</p>
 
+<h2>view</h2>
 
-</article>
+<p><code>{{view App.FooView}}</code> will create an instance of
+<code>App.FooView</code> (with <code>foo.handlebars</code> template unless you override the
+name) and insert it in place. You can bind on properties of the view,
+such as <code>{{view App.FooView contentBinding="foobar"}}{% endraw
+%}</code>, or just specify a property directly <code>{% raw %}{{view App.FooView
+class="foobar"}}</code>.</p>
 
+<p>This is a low level thing and is mostly used to instantiate simple
+views, such as <code>{{view Ember.TextField valueBinding="name" class="username"}}</code></p>
 
+<h2>render &amp;&amp; control</h2>
 
-<article>
-  
-<h1><a href="/blog/2013/02/08/router-request-lifecycle/">Router Request Lifecycle</a></h1>
-<time datetime="2013-02-08T16:59:00+01:00" pubdate><span class='month'>Feb</span> <span class='day'>08</span> <span class='year'>2013</span></time>
+<p>Most of the time you&#8217;re looking to use <code>{{render}}</code> instead of
+<code>{{view}}</code> as it offers better means of
+abstraction. <code>{{render "foo" bar}}</code> will create a
+<code>App.FooController</code> and bind it&#8217;s content to <code>bar</code>.  It also creates a
+<code>App.FooView</code> and renders a <code>foo</code> template.</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/router/'>Router</a></span>
-</footer>
+<p>One drawback is that <code>{{render}}</code> <strong>can not be called multiple times on
+a single route</strong>. If you need a self sustainable widget which can be
+created any number of times you want, you&#8217;re looking for <code>{{control}}</code>
+which has exactly the same effect as <code>{{render}}</code>, but it will have a new
+controller instance every time you call it, while <code>{{render}w</code> uses a
+singleton controller.</p>
 
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/02/02/using-transactions-in-ember-data/">Using Transactions in Ember Data - part 1</a></h1>
-<time datetime="2013-02-02T14:15:00+01:00" pubdate><span class='month'>Feb</span> <span class='day'>02</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/data/'>Data</a>, <a class='category' href='/blog/categories/transactions/'>Transactions</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention/">Ember.js Router and Template Naming Convention</a></h1>
-<time datetime="2013-02-01T19:43:00+01:00" pubdate><span class='month'>Feb</span> <span class='day'>01</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/router/'>Router</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js/">How to find a model by any attribute in Ember.js</a></h1>
-<time datetime="2013-01-31T23:13:00+01:00" pubdate><span class='month'>Jan</span> <span class='day'>31</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/data/'>Data</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/01/27/controller-objectcontroller-and-objectproxy/">Controller, ObjectController and ObjectProxy</a></h1>
-<time datetime="2013-01-27T19:24:00+01:00" pubdate><span class='month'>Jan</span> <span class='day'>27</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/controller/'>controller</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/01/27/state-manager-and-friends/">State Manager and Friends - part 1</a></h1>
-<time datetime="2013-01-27T19:23:00+01:00" pubdate><span class='month'>Jan</span> <span class='day'>27</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/ember/'>Ember</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/01/27/concatenated-properties/">Concatenated Properties</a></h1>
-<time datetime="2013-01-27T18:18:00+01:00" pubdate><span class='month'>Jan</span> <span class='day'>27</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/core/'>core</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/01/27/ember-data-in-depth/">Ember Data in Depth</a></h1>
-<time datetime="2013-01-27T13:52:00+01:00" pubdate><span class='month'>Jan</span> <span class='day'>27</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/data/'>Data</a>, <a class='category' href='/blog/categories/ember/'>Ember</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/01/27/controllers-needs-explained/">Controller&#8217;s Needs Explained</a></h1>
-<time datetime="2013-01-27T11:53:00+01:00" pubdate><span class='month'>Jan</span> <span class='day'>27</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/controller/'>controller</a></span>
-</footer>
-
-
-</article>
-
+<p>Please keep in mind that <code>{{control}}</code> is currently under heavy
+development and will probably change soon, because of the high number of
+issues there are with it.</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Jakub Arnold</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-10T21:29:00+01:00" pubdate data-updated="true">Feb 10<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/templates/'>Templates</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://darthdeus.github.com/blog/2013/02/10/render/" data-via="darthdeus" data-counturl="http://darthdeus.github.com/blog/2013/02/10/render/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/02/08/router-request-lifecycle/" title="Previous Post: Router Request Lifecycle">&laquo; Router Request Lifecycle</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -298,7 +270,10 @@ Feb 08 2013 posted in Router &hellip;">
       var disqus_shortname = 'darthdeus';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://darthdeus.github.com/blog/2013/02/10/render/';
+        var disqus_url = 'http://darthdeus.github.com/blog/2013/02/10/render/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
