@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Templates | darthdeus vs Ember.js]]></title>
+  <link href="http://darthdeus.github.com/blog/categories/templates/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.com/"/>
+  <updated>2013-02-10T21:39:30+01:00</updated>
+  <id>http://darthdeus.github.com/</id>
+  <author>
+    <name><![CDATA[Jakub Arnold]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[render, control, partial, view, template]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/02/10/render/"/>
+    <updated>2013-02-10T21:29:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/02/10/render</id>
+    <content type="html"><![CDATA[<p>There are many ways one can DRY up templates when using Ember.js, it all
+depends on what you're trying to achieve.</p>
+
+<h2>partial &amp;&amp; template</h2>
+
+<p><code>{{partial "foo"}}</code> will take a template <code>foo.handlebars</code> and insert it
+without changing anything, which is exactly the same as in Rails. There
+are no views created, no scope changes, it just inserts the template
+right there.</p>
+
+<p><code>{{template}}</code> isn't really meant to be used anymore, so use
+<code>{{partial}}</code> instead.</p>
+
+<h2>view</h2>
+
+<p><code>{{view App.FooView}}</code> will create an instance of <code>App.FooView</code> (with
+<code>foo.handlebars</code> template unless you override the name) and insert it in
+place. You can bind on properties of the view, such as <code>{{view
+App.FooView contentBinding="foobar"}}</code>, or just specify a property
+directly <code>{{view App.FooView class="foobar"}}</code>.</p>
+
+<p>This is a low level thing and is mostly used to instantiate simple
+views, such as <code>{{view Ember.TextField valueBinding="name"
+class="username"}}</code></p>
+
+<h2>render &amp;&amp; control</h2>
+
+<p>Most of the time you're looking to use <code>{{render}}</code> instead of
+<code>{{view}}</code> as it offers better means of abstraction. <code>{{render "foo"
+bar}}</code> will create a <code>App.FooController</code> and bind it's content to <code>bar</code>.
+It also creates a <code>App.FooView</code> and renders a <code>foo</code> template.</p>
+
+<p>One drawback is that <code>{{render}}</code> <strong>can not be called multiple times on
+a single route</strong>. If you need a self sustainable widget which can be
+created any number of times you want, you're looking for <code>{{control}}</code>
+whic has exactly the same effect as <code>{{redner}}</code>, but it will have a new
+controller instance every time you call it, while <code>{{render}}</code> uses a
+singleton controller.</p>
+
+<p>Please keep in mind that <code>{{control}}</code> is currently under heavy
+development and will probably change soon, because of the high number of
+issues there are with it.</p>
+]]></content>
+  </entry>
+  
+</feed>

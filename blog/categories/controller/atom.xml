@@ -4,7 +4,7 @@
   <title><![CDATA[Category: controller | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/controller/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-10T21:10:08+01:00</updated>
+  <updated>2013-02-10T21:39:30+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -134,7 +134,7 @@ this</p>
 <!-- inside `users` template -->
 
 
-<p>{{controllers.foo}}
+<p>{% raw %}{{controllers.foo}}{% endraw %}
 ```</p>
 
 <h2>Needs vs routing</h2>
@@ -186,7 +186,7 @@ App.PostIndexController = Ember.ObjectController.extend({
 <p>and in the <code>post/index</code> template, you can access the content like this</p>
 
 <p><code>html
-{{controllers.post.content}}
+{% raw %}{{controllers.post.content}}{% endraw %}
 </code></p>
 
 <p>By specifying the need Ember will make sure that it gives you the right
