@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Router | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/router/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-10T20:00:48+01:00</updated>
+  <updated>2013-02-10T20:23:32+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -45,9 +45,31 @@ internally)</li>
 <h2><code>activate</code>/<code>deactivate</code></h2>
 
 <p>These were formely known as <code>enter</code>/<code>exit</code>, which are now marked as
-private.</p>
+private. <code>activate</code> will be executed when user enters a route, be it
+from a transition or from a URL directly, and <code>deactivate</code> is executed
+when user transitions away from the route.</p>
 
-<p><strong>TODO - transactions</strong></p>
+<p>One of the most common use cases for me is doing a transaction rollback
+in <code>deactivate</code>.</p>
+
+<p>```javascript
+App.PostsNewRoute = Ember.Route.extend({</p>
+
+<p>  deactivate: function() {</p>
+
+<pre><code>this.modelFor("postsNew").get("transaction").rollback();
+</code></pre>
+
+<p>  }</p>
+
+<p>});
+```</p>
+
+<p>I find this mostly useful when having a <em>new record form</em> (or even when
+editing a record), where you basically want to rollback any changes
+which happened when the user exits the route. It doesn't matter if the
+user submits the form first, because then the transaction will be
+comitted and there will be nothing to rollback.</p>
 
 <h2><code>model</code>/<code>serialize</code></h2>
 
@@ -201,7 +223,7 @@ App.PostsRoute = Ember.Route.extend({</p>
 
 <p>  setupController: function(controller) {</p>
 
-<pre><code>controller.set("content", App.User.find());
+<pre><code>controller.set("content", App.Post.find());
 </code></pre>
 
 <p>  }</p>
