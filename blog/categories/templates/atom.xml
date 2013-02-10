@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Templates | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/templates/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-10T22:55:04+01:00</updated>
+  <updated>2013-02-10T23:49:58+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -36,9 +36,8 @@ changes, it just inserts the template right there.</p>
 <p><code>{{view App.FooView}}</code> will create an instance of
 <code>App.FooView</code> (with <code>foo.handlebars</code> template unless you override the
 name) and insert it in place. You can bind on properties of the view,
-such as <code>{{view App.FooView contentBinding="foobar"}}{% endraw
-%}</code>, or just specify a property directly <code>{% raw %}{{view App.FooView
-class="foobar"}}</code>.</p>
+such as <code>{{view App.FooView contentBinding="foobar"}}</code>,
+or just specify a property directly <code>{{view App.FooView class="foobar"}}</code>.</p>
 
 <p>This is a low level thing and is mostly used to instantiate simple
 views, such as <code>{{view Ember.TextField valueBinding="name" class="username"}}</code></p>
