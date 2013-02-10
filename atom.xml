@@ -4,7 +4,7 @@
   <title><![CDATA[darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-02T18:08:22+01:00</updated>
+  <updated>2013-02-10T19:59:53+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -12,6 +12,253 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Router Request Lifecycle]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/02/08/router-request-lifecycle/"/>
+    <updated>2013-02-08T16:59:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/02/08/router-request-lifecycle</id>
+    <content type="html"><![CDATA[<h1>Request Lifecycle</h1>
+
+<p>Router is the core part of Ember. Every time we go to a new URL it means
+the
+route object is called with our params and stuff. These are the hooks
+sorted in order in which they are called</p>
+
+<ul>
+<li>enter (private)</li>
+<li>activate - executed when entering the route</li>
+<li>deserialize (private)</li>
+<li>model (formely deserialize) - takes the params and returns a model
+which is set to the route&#8217;s <code>currentModel</code></li>
+<li>serialize - used to generate dynamic segments in the URL from a model</li>
+<li>setupController - takes <code>currentModel</code> and sets it to the controller&#8217;s
+<code>content</code> by default</li>
+<li>renderTemplate - takes current controller and what <code>model</code> returns and
+renders the template with an appropriate name</li>
+<li>deactivate - executed when exiting the route (called by exit
+internally)</li>
+<li>exit (private, requires call to <code>this._super</code>)</li>
+</ul>
+
+
+<p>Now let&#8217;s take a look at them in more detail</p>
+
+<h2><code>activate</code>/<code>deactivate</code></h2>
+
+<p>These were formely known as <code>enter</code>/<code>exit</code>, which are now marked as
+private.</p>
+
+<p><strong>TODO - transactions</strong></p>
+
+<h2><code>model</code>/<code>serialize</code></h2>
+
+<p>To allow Ember to work with dynamic segments in the URLs we need to
+teach it how to serialize and deserialize our models. When we enter a
+URL directly (or reload the page) <code>model</code> will be called with params
+from the dynamic segments. Let&#8217;s take a look at an example</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">resource</span><span class="p">(</span><span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/:post_id&quot;</span> <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">PostRoute</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Route</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">model</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Post</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">post_id</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is exactly what Ember will auto generate for us, along with a
+serialize hook</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">PostRoute</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Route</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">model</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Post</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">post_id</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">serialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span> <span class="nx">post_id</span><span class="o">:</span> <span class="nx">model</span><span class="p">.</span><span class="nx">id</span> <span class="p">};</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>it is important to note here that if we&#8217;re transitioning from a
+different route our <code>model</code> hook <em>will not be called</em>.</p>
+
+<h2><code>setupController</code></h2>
+
+<p>One step further after <code>model</code> comes <code>setupController</code>, which is meant
+to set the content for current controller to the thing which <code>model</code>
+returns (or specifically to <code>currentModel</code>, but more about that later).</p>
+
+<p>This is how the autogenerated <code>setupController</code> would look like</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">PostRoute</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Route</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">model</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Post</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">post_id</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">serialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span> <span class="nx">post_id</span><span class="o">:</span> <span class="nx">model</span><span class="p">.</span><span class="nx">id</span> <span class="p">};</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">setupController</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">controller</span><span class="p">,</span> <span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">controller</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">,</span> <span class="nx">model</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2><code>renderTemplate</code></h2>
+
+<p>The last one of the hooks is <code>renderTemplate</code> where you tell which
+template you want to render in which outlet.</p>
+
+<p>By default <code>renderTemplate</code> will call <code>this.render</code> as follows</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">PostRoute</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Route</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">renderTemplate</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">into</span><span class="o">:</span> <span class="s2">&quot;application&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">outlet</span><span class="o">:</span> <span class="s2">&quot;main&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">controller</span><span class="o">:</span> <span class="s2">&quot;post&quot;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this case <code>render</code> will render the <code>post</code> template into the
+<code>application</code> template&#8217;s <code>main</code> outlet with the <code>PostController</code>.</p>
+
+<p>This is the place where you can chose to render into other outlets. For
+example let&#8217;s say that your <code>application</code> template has a sidebar outlet
+&#8220;.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">PostRoute</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Route</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">renderTemplate</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// render with the defaults</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// and once more for the sidebar outlet</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="s2">&quot;similarPosts&quot;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">into</span><span class="o">:</span> <span class="s2">&quot;application&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">outlet</span><span class="o">:</span> <span class="s2">&quot;sidebar&quot;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Important notes about <code>controllerFor</code> and <code>modelFor</code></h2>
+
+<p>While calling <code>controllerFor("posts")</code> returns an instance of
+<code>PostsController</code>, calling <code>modelFor("posts")</code> <strong>doesn&#8217;t return
+<code>content</code>
+of the <code>PostController</code></strong>. Instead it looks up the <code>PostsRoute</code> and
+returns it&#8217;s <code>currentModel</code> which is set when we return a value from the
+<code>model</code> hook.</p>
+
+<p>Let&#8217;s see an example</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">PostsRoute</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Route</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">setupController</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">controller</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">controller</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">,</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">find</span><span class="p">());</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will cause issues if we decide to use <code>modelFor</code> later on.
+<code>PostsRoute</code> will not have anything in <code>currentModel</code> and <code>modelFor</code>
+will return undefined, which might look weird as the controller has a
+content properly set.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using Transactions in Ember Data - part 1]]></title>
