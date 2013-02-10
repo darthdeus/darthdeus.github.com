@@ -4,7 +4,7 @@
   <title><![CDATA[darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-10T19:59:53+01:00</updated>
+  <updated>2013-02-10T20:00:48+01:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -18,9 +18,7 @@
     <link href="http://darthdeus.github.com/blog/2013/02/08/router-request-lifecycle/"/>
     <updated>2013-02-08T16:59:00+01:00</updated>
     <id>http://darthdeus.github.com/blog/2013/02/08/router-request-lifecycle</id>
-    <content type="html"><![CDATA[<h1>Request Lifecycle</h1>
-
-<p>Router is the core part of Ember. Every time we go to a new URL it means
+    <content type="html"><![CDATA[<p>Router is the core part of Ember. Every time we go to a new URL it means
 the
 route object is called with our params and stuff. These are the hooks
 sorted in order in which they are called</p>
