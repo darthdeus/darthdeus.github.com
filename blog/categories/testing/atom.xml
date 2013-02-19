@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Testing | darthdeus vs Ember.js]]></title>
+  <link href="http://darthdeus.github.com/blog/categories/testing/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.com/"/>
+  <updated>2013-02-20T00:36:58+01:00</updated>
+  <id>http://darthdeus.github.com/</id>
+  <author>
+    <name><![CDATA[Jakub Arnold]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Testing Ember.js - part 1]]></title>
+    <link href="http://darthdeus.github.com/blog/2013/02/19/testing-ember-dot-js-part-1/"/>
+    <updated>2013-02-19T19:05:00+01:00</updated>
+    <id>http://darthdeus.github.com/blog/2013/02/19/testing-ember-dot-js-part-1</id>
+    <content type="html"><![CDATA[<p>Ever since I saw the <em>testing</em> slides from EmberCamp I was thinking
+about testing. Up until now I've been using Capybara which is really
+really really slow.</p>
+
+<p>But @joliss mentioned this thing called <code>Ember.testing</code> which should
+automagically fix all of the async problems which make tests ugly, such
+as waiting for the application to initialize and finish routing.</p>
+
+<p>In its essence <code>Ember.testing = true</code> disables the automatic runloop,
+which gives you the control to manually schedule asynchronous operations
+to happen in a one-off runloop via <code>Ember.run</code>.</p>
+
+<p><code>Ember.run</code> will run the given function inside a runloop and flush all
+of the bindings before it finishes, which means you can render a view
+inside <code>Ember.run</code> and check the DOM right after that. Here's an example
+from the <code>Ember.View</code> tests</p>
+
+<p>```javascript
+view = Ember.ContainerView.create({
+  childViews: ["child"],</p>
+
+<p>  child: Ember.View.create({</p>
+
+<pre><code>tagName: 'aside'
+</code></pre>
+
+<p>  })
+});</p>
+
+<p>Ember.run(function(){
+  view.createElement();
+});</p>
+
+<p>equal(view.$('aside').length, 1);
+```</p>
+
+<p>As you can see the <code>view.createElement()</code> happens inside the runloop
+scheduled by <code>Ember.run</code> which will return only after the view was
+completely rendered and all bindings flushed.</p>
+
+<p>Let's take a look at a <a href="http://jsbin.com/ixupad/59/edit">complete example</a>
+and take it apart step by step</p>
+
+<p>```javascript
+// Testing mode disables automatic runloop
+Ember.testing = true;</p>
+
+<p>// Creating an application normally happens async,
+// which is why we have to wrap it in Ember.run
+Ember.run(function() {
+  App = Ember.Application.create();
+});</p>
+
+<p>App.Router.map(function() {
+  this.route("home", { path: "/" });
+});</p>
+
+<p>App.Store = DS.Store.extend({
+  revision: 11,
+  adapter: DS.FixtureAdapter.extend({</p>
+
+<pre><code>// This will make the FixtureAdapter do everything synchronously
+// instead of using setTimeout, which is vital because setTimeout
+// happens outside of the runloop.
+simulateRemoteResponse: false
+</code></pre>
+
+<p>  })
+});</p>
+
+<p>App.User = DS.Model.extend({ name: DS.attr("string")});
+App.User.FIXTURES = [ { id: 1, name: "brohuda" }];</p>
+
+<p>App.HomeRoute = Ember.Route.extend({
+  model: function() {</p>
+
+<pre><code>return App.User.find(1);
+</code></pre>
+
+<p>  }
+});</p>
+
+<p>// Enabling Ember.testing will also disable automatic initialization,
+// which forces us to initialize manually
+Ember.run(function() {
+  App.initialize();
+});</p>
+
+<p>// In real life this would be an assertion,
+// here we'll just check if everything is rendered at this point in time.
+$("p strong").append($("h2").text());
+```</p>
+
+<p>Take the example apart, play with it and try to figure out what works
+and what doesn't :)</p>
+
+<p>If you see</p>
+
+<p><code>
+assertion failed: You have turned on testing mode, which disabled the run-loop's autorun.
+You will need to wrap any code with asynchronous side-effects in an Ember.run
+</code></p>
+
+<p>it means that you forgot to wrap something in <code>Ember.run</code>. I hope this
+is a good enough introduction. In one of the upcoming articles we'll
+take a look at simple Ember application and try testing it with a
+full featured testing framework.</p>
+]]></content>
+  </entry>
+  
+</feed>

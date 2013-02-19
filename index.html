@@ -9,8 +9,9 @@
   <meta name="author" content="Jakub Arnold">
 
   
-  <meta name="description" content="There are many ways one can DRY up templates when using Ember.js, it all
-depends on what you&#8217;re trying to achieve. partial &amp;&amp; template &hellip;">
+  <meta name="description" content="Ever since I saw the testing slides from EmberCamp I was thinking
+about testing. Up until now I&#8217;ve been using Capybara which is really
+really &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -71,6 +72,197 @@ depends on what you&#8217;re trying to achieve. partial &amp;&amp; template &hel
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/02/19/testing-ember-dot-js-part-1/">Testing Ember.js - Part 1</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-19T19:05:00+01:00" pubdate data-updated="true">Feb 19<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Ever since I saw the <em>testing</em> slides from EmberCamp I was thinking
+about testing. Up until now I&#8217;ve been using Capybara which is really
+really really slow.</p>
+
+<p>But @joliss mentioned this thing called <code>Ember.testing</code> which should
+automagically fix all of the async problems which make tests ugly, such
+as waiting for the application to initialize and finish routing.</p>
+
+<p>In its essence <code>Ember.testing = true</code> disables the automatic runloop,
+which gives you the control to manually schedule asynchronous operations
+to happen in a one-off runloop via <code>Ember.run</code>.</p>
+
+<p><code>Ember.run</code> will run the given function inside a runloop and flush all
+of the bindings before it finishes, which means you can render a view
+inside <code>Ember.run</code> and check the DOM right after that. Here&#8217;s an example
+from the <code>Ember.View</code> tests</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">view</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">ContainerView</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">childViews</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;child&quot;</span><span class="p">],</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">child</span><span class="o">:</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;aside&#39;</span>
+</span><span class='line'>  <span class="p">})</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Ember</span><span class="p">.</span><span class="nx">run</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>  <span class="nx">view</span><span class="p">.</span><span class="nx">createElement</span><span class="p">();</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">equal</span><span class="p">(</span><span class="nx">view</span><span class="p">.</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;aside&#39;</span><span class="p">).</span><span class="nx">length</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see the <code>view.createElement()</code> happens inside the runloop
+scheduled by <code>Ember.run</code> which will return only after the view was
+completely rendered and all bindings flushed.</p>
+
+<p>Let&#8217;s take a look at a <a href="http://jsbin.com/ixupad/59/edit">complete example</a>
+and take it apart step by step</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Testing mode disables automatic runloop</span>
+</span><span class='line'><span class="nx">Ember</span><span class="p">.</span><span class="nx">testing</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Creating an application normally happens async,</span>
+</span><span class='line'><span class="c1">// which is why we have to wrap it in Ember.run</span>
+</span><span class='line'><span class="nx">Ember</span><span class="p">.</span><span class="nx">run</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">App</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Application</span><span class="p">.</span><span class="nx">create</span><span class="p">();</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">route</span><span class="p">(</span><span class="s2">&quot;home&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/&quot;</span> <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">Store</span> <span class="o">=</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">Store</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">revision</span><span class="o">:</span> <span class="mi">11</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">adapter</span><span class="o">:</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">FixtureAdapter</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>    <span class="c1">// This will make the FixtureAdapter do everything synchronously</span>
+</span><span class='line'>    <span class="c1">// instead of using setTimeout, which is vital because setTimeout</span>
+</span><span class='line'>    <span class="c1">// happens outside of the runloop.</span>
+</span><span class='line'>    <span class="nx">simulateRemoteResponse</span><span class="o">:</span> <span class="kc">false</span>
+</span><span class='line'>  <span class="p">})</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">User</span> <span class="o">=</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)});</span>
+</span><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">FIXTURES</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">id</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;brohuda&quot;</span> <span class="p">}];</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">HomeRoute</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Route</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">model</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Enabling Ember.testing will also disable automatic initialization,</span>
+</span><span class='line'><span class="c1">// which forces us to initialize manually</span>
+</span><span class='line'><span class="nx">Ember</span><span class="p">.</span><span class="nx">run</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">App</span><span class="p">.</span><span class="nx">initialize</span><span class="p">();</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// In real life this would be an assertion,</span>
+</span><span class='line'><span class="c1">// here we&#39;ll just check if everything is rendered at this point in time.</span>
+</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;p strong&quot;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;h2&quot;</span><span class="p">).</span><span class="nx">text</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Take the example apart, play with it and try to figure out what works
+and what doesn&#8217;t :)</p>
+
+<p>If you see</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">assertion</span> <span class="nx">failed</span><span class="o">:</span> <span class="nx">You</span> <span class="nx">have</span> <span class="nx">turned</span> <span class="nx">on</span> <span class="nx">testing</span> <span class="nx">mode</span><span class="p">,</span> <span class="nx">which</span> <span class="nx">disabled</span> <span class="nx">the</span> <span class="nx">run</span><span class="o">-</span><span class="nx">loop</span><span class="err">&#39;</span><span class="nx">s</span> <span class="nx">autorun</span><span class="p">.</span>
+</span><span class='line'><span class="nx">You</span> <span class="nx">will</span> <span class="nx">need</span> <span class="nx">to</span> <span class="nx">wrap</span> <span class="nx">any</span> <span class="nx">code</span> <span class="kd">with</span> <span class="nx">asynchronous</span> <span class="nx">side</span><span class="o">-</span><span class="nx">effects</span> <span class="k">in</span> <span class="nx">an</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">run</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>it means that you forgot to wrap something in <code>Ember.run</code>. I hope this
+is a good enough introduction. In one of the upcoming articles we&#8217;ll
+take a look at simple Ember application and try testing it with a
+full featured testing framework.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1800,161 +1992,9 @@ bucket</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
-        <h1 class="entry-title"><a href="/blog/2013/01/27/controllers-needs-explained/">Controller&#8217;s Needs Explained</a></h1>
-      
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-01-27T11:53:00+01:00" pubdate data-updated="true">Jan 27<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Since the v2 router came it became clear that using global singleton
-controllers like <code>App.userController = App.UserController.create()</code> is
-not the way to go. This prevents us from doing a simple binding like</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">UserController</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">ObjectController</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">accountsBinding</span><span class="o">:</span> <span class="s2">&quot;App.accountsController.content&quot;</span>
-</span><span class='line'><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>There is no need or even possibility to manage the controller instances
-with the new router though. It will create the instance for us. One way
-we can use this is with <code>this.controllerFor</code>, which can be used inside
-of a route.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">UserRoute</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Route</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">setupController</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">controller</span><span class="p">,</span> <span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// some magic with `this.controllerFor(&quot;user&quot;)`</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>but since this method is only available on the route and not inside a
-controller, it wasn&#8217;t very pleasant to specify dependencies (or needs)
-between controllers. Which is exactly where needs come in and solve the
-issue</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">UserController</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">ObjectController</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">needs</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">]</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>this will give you the opportunity to call <code>controllers.foo</code> on the
-<code>App.UserController</code> instance and get back an instance of
-<code>App.FooController</code>. You could even (ab)use that in the templates like
-this</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="c">&lt;!-- inside `users` template --&gt;</span>
-</span><span class='line'>{{controllers.foo}}
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Needs vs routing</h2>
-
-<p>Needs become incredibly useful when you have nested routes, for example</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">resource</span><span class="p">(</span><span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/posts/:post_id&quot;</span> <span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">route</span><span class="p">(</span><span class="s2">&quot;edit&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;/edit&quot;</span> <span class="p">});</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In this case we will get <code>post</code>, <code>post.index</code> and <code>post.edit</code>. If you go
-to <code>/posts/1</code> you expect to get <code>post.index</code> template, which is true,
-but the context (or model, or content) is being set on the
-<code>PostController</code>, not on <code>PostIndexController</code>.</p>
-
-<p>When you think about it it does make sense, because the <code>resource</code> is
-basically shared between <code>post.index</code> and <code>post.edit</code>, that&#8217;s why it is
-fetched and stored in their parent. Let&#8217;s go through this in detail:</p>
-
-<ul>
-<li>visit <code>/posts/1</code></li>
-<li>router basically does <code>App.Post.find(1)</code> <strong>and assigns that to the
-content of <code>PostController</code></strong></li>
-<li>template <code>post</code> is rendered</li>
-<li>template <code>post.index</code> is rendered in <code>post</code>&#8217;s outlet</li>
-</ul>
-
-
-<p>and when you transition to <code>/posts/1/edit</code>, the only thing that changes
-is the leaf route, you still keep the same <code>App.Post</code> model, because it
-belongs to the parent <code>PostRoute</code>, not to the leaf <code>PostIndexRoute</code>. But
-this has a drawback. You&#8217;re not able to directly access the content from
-the <code>post.index</code> template, since it doesn&#8217;t belong to it&#8217;s controller.
-That&#8217;s where needs come in.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">PostIndexController</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">ObjectController</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">needs</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;post&quot;</span><span class="p">]</span>
-</span><span class='line'><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>and in the <code>post/index</code> template, you can access the content like this</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>{{controllers.post.content}}
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>By specifying the need Ember will make sure that it gives you the right
-<code>PostController</code> instance with it&#8217;s content set to the right value.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/2/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -1965,6 +2005,10 @@ That&#8217;s where needs come in.</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/02/19/testing-ember-dot-js-part-1/">Testing Ember.js - part 1</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/02/10/render-control-partial-view/">render, control, partial, view, template</a>
@@ -1980,10 +2024,6 @@ That&#8217;s where needs come in.</p>
     
       <li class="post">
         <a href="/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention/">Ember.js Router and Template Naming Convention</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js/">How to find a model by any attribute in Ember.js</a>
       </li>
     
   </ul>
