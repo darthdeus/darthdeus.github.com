@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Transactions | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/transactions/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-20T00:36:58+01:00</updated>
+  <updated>2013-08-17T12:47:34+02:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -61,24 +61,20 @@ later.</p>
 
 <p>```javascript
 App.UsersNewRoute = Ember.Route.extend({
-  model: function() {</p>
+  model: function() {
+    var transaction = this.get("store").transaction();</p>
 
-<pre><code>var transaction = this.get("store").transaction();
-
-var user = transaction.createRecord(App.User, {});
+<pre><code>var user = transaction.createRecord(App.User, {});
 return user;
 </code></pre>
 
 <p>  },</p>
 
-<p>  events: {</p>
-
-<pre><code>createUser: function(user) {
-  user.get("transaction").commit();
-}
-</code></pre>
-
-<p>  }
+<p>  events: {
+    createUser: function(user) {
+      user.get("transaction").commit();
+    }
+  }
 });
 ```</p>
 

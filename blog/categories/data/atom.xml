@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Data | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/data/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-20T00:36:58+01:00</updated>
+  <updated>2013-08-17T12:47:34+02:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -61,24 +61,20 @@ later.</p>
 
 <p>```javascript
 App.UsersNewRoute = Ember.Route.extend({
-  model: function() {</p>
+  model: function() {
+    var transaction = this.get("store").transaction();</p>
 
-<pre><code>var transaction = this.get("store").transaction();
-
-var user = transaction.createRecord(App.User, {});
+<pre><code>var user = transaction.createRecord(App.User, {});
 return user;
 </code></pre>
 
 <p>  },</p>
 
-<p>  events: {</p>
-
-<pre><code>createUser: function(user) {
-  user.get("transaction").commit();
-}
-</code></pre>
-
-<p>  }
+<p>  events: {
+    createUser: function(user) {
+      user.get("transaction").commit();
+    }
+  }
 });
 ```</p>
 
@@ -255,11 +251,10 @@ can affect how our application behaves. For example if we try to modify
 a record which is already being saved, we will get an exception saying
 something like this</p>
 
-<p><code>
-Attempted to handle event `willSetProperty` on &lt;App.User:ember1144:null&gt;
+<pre><code>Attempted to handle event `willSetProperty` on &lt;App.User:ember1144:null&gt;
 while in state rootState.loaded.created.inFlight. Called with
 {reference: [object Object], store: &lt;App.Store:ember313&gt;, name: username}
-</code></p>
+</code></pre>
 
 <p>The important part here is the <code>rootState.loaded.created.inFlight</code>. If
 we look at <a href="https://github.com/emberjs/data/blob/f274153754cb8b629cd98fc6c590f18bc8ee3ff6/packages/ember-data/lib/system/model/states.js#L254-L261">the source of <code>DirtyState</code></a>, we can see what this means</p>
@@ -353,10 +348,8 @@ record = transaction.createRecord(App.User, {});</p>
 <p>transaction.commit(); // this will save the record to the server</p>
 
 <p>record.set("foo", "bar");
-transaction.commit(); // nothing is committed here, because the record</p>
-
-<pre><code>                  // is removed from the transaction when it is saved
-</code></pre>
+transaction.commit(); // nothing is committed here, because the record
+                      // is removed from the transaction when it is saved</p>
 
 <p>store.commit(); // this will save the record properly
 ```</p>
@@ -439,16 +432,13 @@ various states in. This is first initialized in the <a href="https://github.com/
 
 <p>```javascript
 init: function() {
-  set(this, 'buckets', {</p>
-
-<pre><code>clean:    Ember.OrderedSet.create(),
-created:  Ember.OrderedSet.create(),
-updated:  Ember.OrderedSet.create(),
-deleted:  Ember.OrderedSet.create(),
-inflight: Ember.OrderedSet.create()
-</code></pre>
-
-<p>  });</p>
+  set(this, 'buckets', {
+    clean:    Ember.OrderedSet.create(),
+    created:  Ember.OrderedSet.create(),
+    updated:  Ember.OrderedSet.create(),
+    deleted:  Ember.OrderedSet.create(),
+    inflight: Ember.OrderedSet.create()
+  });</p>
 
 <p>  set(this, 'relationships', Ember.OrderedSet.create());
 }

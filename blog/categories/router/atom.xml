@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Router | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/router/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-20T00:36:58+01:00</updated>
+  <updated>2013-08-17T12:47:34+02:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -55,12 +55,9 @@ in <code>deactivate</code>.</p>
 <p>```javascript
 App.PostsNewRoute = Ember.Route.extend({</p>
 
-<p>  deactivate: function() {</p>
-
-<pre><code>this.modelFor("postsNew").get("transaction").rollback();
-</code></pre>
-
-<p>  }</p>
+<p>  deactivate: function() {
+    this.modelFor("postsNew").get("transaction").rollback();
+  }</p>
 
 <p>});
 ```</p>
@@ -85,12 +82,9 @@ App.Router.map(function() {
 
 <p>App.PostRoute = Ember.Route.extend({</p>
 
-<p>  model: function(params) {</p>
-
-<pre><code>return App.Post.find(params.post_id);
-</code></pre>
-
-<p>  }</p>
+<p>  model: function(params) {
+    return App.Post.find(params.post_id);
+  }</p>
 
 <p>});
 ```</p>
@@ -101,19 +95,13 @@ serialize hook</p>
 <p>```javascript
 App.PostRoute = Ember.Route.extend({</p>
 
-<p>  model: function(params) {</p>
+<p>  model: function(params) {
+    return App.Post.find(params.post_id);
+  },</p>
 
-<pre><code>return App.Post.find(params.post_id);
-</code></pre>
-
-<p>  },</p>
-
-<p>  serialize: function(model) {</p>
-
-<pre><code>return { post_id: model.id };
-</code></pre>
-
-<p>  }</p>
+<p>  serialize: function(model) {
+    return { post_id: model.id };
+  }</p>
 
 <p>});
 ```</p>
@@ -155,16 +143,13 @@ template you want to render in which outlet.</p>
 <p>```javascript
 App.PostRoute = App.Route.extend({</p>
 
-<p>  renderTemplate: function() {</p>
-
-<pre><code>this.render("post", {
-  into: "application",
-  outlet: "main",
-  controller: "post"
-});
-</code></pre>
-
-<p>  }</p>
+<p>  renderTemplate: function() {
+    this.render("post", {
+      into: "application",
+      outlet: "main",
+      controller: "post"
+    });
+  }</p>
 
 <p>});
 ```</p>
@@ -179,12 +164,11 @@ example let's say that your <code>application</code> template has a sidebar outl
 <p>```javascript
 App.PostRoute = App.Route.extend({</p>
 
-<p>  renderTemplate: function() {</p>
+<p>  renderTemplate: function() {
+    // render with the defaults
+    this.render();</p>
 
-<pre><code>// render with the defaults
-this.render();
-
-// and once more for the sidebar outlet
+<pre><code>// and once more for the sidebar outlet
 this.render("similarPosts", {
   into: "application",
   outlet: "sidebar"
@@ -210,12 +194,9 @@ returns it's <code>currentModel</code> which is set when we return a value from 
 <p>```javascript
 App.PostsRoute = Ember.Route.extend({</p>
 
-<p>  setupController: function(controller) {</p>
-
-<pre><code>controller.set("content", App.Post.find());
-</code></pre>
-
-<p>  }</p>
+<p>  setupController: function(controller) {
+    controller.set("content", App.Post.find());
+  }</p>
 
 <p>});
 ```</p>
@@ -269,18 +250,17 @@ App.Router.map(function() {
 </script>
 
 
-<p>```</p>
+<pre><code>
+With the following naming
 
-<p>With the following naming</p>
-
-<p><code>javascript
+```javascript
 PostsRoute
 PostsController
 PostsView
 NewRoute
 NewController
 NewView
-</code></p>
+</code></pre>
 
 <p><a href="http://jsbin.com/ogorab/33/edit">Here's a JSBin</a></p>
 
@@ -288,16 +268,13 @@ NewView
 and you'd need to scope them to the resource, which would be done as
 follows</p>
 
-<p>```javascript
+<p><code>javascript
 App.Router.map(function() {
-  this.resource("posts", { path: "/" }, function() {</p>
-
-<pre><code>this.route("new", { path: "/new" });
-</code></pre>
-
-<p>  });
+  this.resource("posts", { path: "/" }, function() {
+    this.route("new", { path: "/new" });
+  });
 });
-```</p>
+</code></p>
 
 <p>Here things get a little more complicated, since we're nesting something
 inside the resource. This means that we'll end up with three templates
@@ -326,23 +303,22 @@ instead of two</p>
 </script>
 
 
-<p>```</p>
+<pre><code>
+With the following naming
 
-<p>With the following naming</p>
-
-<p>```javascript
+```javascript
 PostsRoute
 PostsController
-PostsView</p>
+PostsView
 
-<p>PostsIndexRoute
+PostsIndexRoute
 PostsIndexController
-PostsIndexView</p>
+PostsIndexView
 
-<p>PostsNewRoute
+PostsNewRoute
 PostsNewController
 PostsNewView
-```</p>
+</code></pre>
 
 <p><a href="http://jsbin.com/ogorab/34/edit">Here's a JSBin</a></p>
 
@@ -356,13 +332,12 @@ will make it more obvious. We will add a <code>/:post_id</code> and
 
 <p>```javascript
 App.Router.map(function() {
-  this.resource("posts", { path: "/" }, function() {</p>
+  this.resource("posts", { path: "/" }, function() {
+    this.resource("post", { path: "/:post_id" }, function() {
+      this.route("edit", { path: "/edit" });
+    });</p>
 
-<pre><code>this.resource("post", { path: "/:post_id" }, function() {
-  this.route("edit", { path: "/edit" });
-});
-
-this.route("new", { path: "/new" });
+<pre><code>this.route("new", { path: "/new" });
 </code></pre>
 
 <p>  });
@@ -411,19 +386,13 @@ this.</p>
 
 <p>```javascript
 App.Router.map(function() {
-  this.resource("posts", { path: "/" }, function() {</p>
+  this.resource("posts", { path: "/" }, function() {
+    this.route("new", { path: "/new" });
+  });</p>
 
-<pre><code>this.route("new", { path: "/new" });
-</code></pre>
-
-<p>  });</p>
-
-<p>  this.resource("post", { path: "/:post_id" }, function() {</p>
-
-<pre><code>this.route("edit", { path: "/edit" });
-</code></pre>
-
-<p>  });
+<p>  this.resource("post", { path: "/:post_id" }, function() {
+    this.route("edit", { path: "/edit" });
+  });
 });
 ```</p>
 

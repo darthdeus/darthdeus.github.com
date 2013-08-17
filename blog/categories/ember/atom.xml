@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ember | darthdeus vs Ember.js]]></title>
   <link href="http://darthdeus.github.com/blog/categories/ember/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.com/"/>
-  <updated>2013-02-20T00:36:58+01:00</updated>
+  <updated>2013-08-17T12:47:34+02:00</updated>
   <id>http://darthdeus.github.com/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -39,24 +39,18 @@ Ember Data, but we'll get into that).</p>
 
 <p>```javascript
 PostManager = Ember.StateManager.extend({
-  states: {</p>
-
-<pre><code>draft: Ember.State.create(),
-published: Ember.State.create()
-</code></pre>
-
-<p>  }
+  states: {
+    draft: Ember.State.create(),
+    published: Ember.State.create()
+  }
 });</p>
 
 <p>Post = Ember.Object.extend({
   title: null,
-  init: function() {</p>
-
-<pre><code>this.set("stateManager", PostManager.create());
-this._super();
-</code></pre>
-
-<p>  }
+  init: function() {
+    this.set("stateManager", PostManager.create());
+    this._super();
+  }
 });
 ```</p>
 
@@ -79,18 +73,15 @@ post.get("stateManager.states"); // => { draft: ..., published: ... }</p>
 <p>We forgot to say which of the states should be the default. Let's
 do that.</p>
 
-<p>```javascript
+<p><code>javascript
 PostManager = Ember.StateManager.extend({
   initialState: "draft",
-  states: {</p>
-
-<pre><code>draft: Ember.State.create(),
-published: Ember.State.create()
-</code></pre>
-
-<p>  }
+  states: {
+    draft: Ember.State.create(),
+    published: Ember.State.create()
+  }
 });
-```</p>
+</code></p>
 
 <p>From now every single post we create will be a <code>draft</code></p>
 
@@ -114,17 +105,14 @@ redefine our state manager as this</p>
 <p>```javascript
 PostManager = Ember.StateManager.extend({
   initialState: "draft",
-  states: {</p>
-
-<pre><code>draft: Ember.State.create(),
-published: Ember.State.create({
-  enter: function() {
-    console.log("post was published");
+  states: {
+    draft: Ember.State.create(),
+    published: Ember.State.create({
+      enter: function() {
+        console.log("post was published");
+      }
+    })
   }
-})
-</code></pre>
-
-<p>  }
 });</p>
 
 <p>post = Post.create();
@@ -214,11 +202,10 @@ can affect how our application behaves. For example if we try to modify
 a record which is already being saved, we will get an exception saying
 something like this</p>
 
-<p><code>
-Attempted to handle event `willSetProperty` on &lt;App.User:ember1144:null&gt;
+<pre><code>Attempted to handle event `willSetProperty` on &lt;App.User:ember1144:null&gt;
 while in state rootState.loaded.created.inFlight. Called with
 {reference: [object Object], store: &lt;App.Store:ember313&gt;, name: username}
-</code></p>
+</code></pre>
 
 <p>The important part here is the <code>rootState.loaded.created.inFlight</code>. If
 we look at <a href="https://github.com/emberjs/data/blob/f274153754cb8b629cd98fc6c590f18bc8ee3ff6/packages/ember-data/lib/system/model/states.js#L254-L261">the source of <code>DirtyState</code></a>, we can see what this means</p>
@@ -312,10 +299,8 @@ record = transaction.createRecord(App.User, {});</p>
 <p>transaction.commit(); // this will save the record to the server</p>
 
 <p>record.set("foo", "bar");
-transaction.commit(); // nothing is committed here, because the record</p>
-
-<pre><code>                  // is removed from the transaction when it is saved
-</code></pre>
+transaction.commit(); // nothing is committed here, because the record
+                      // is removed from the transaction when it is saved</p>
 
 <p>store.commit(); // this will save the record properly
 ```</p>
@@ -398,16 +383,13 @@ various states in. This is first initialized in the <a href="https://github.com/
 
 <p>```javascript
 init: function() {
-  set(this, 'buckets', {</p>
-
-<pre><code>clean:    Ember.OrderedSet.create(),
-created:  Ember.OrderedSet.create(),
-updated:  Ember.OrderedSet.create(),
-deleted:  Ember.OrderedSet.create(),
-inflight: Ember.OrderedSet.create()
-</code></pre>
-
-<p>  });</p>
+  set(this, 'buckets', {
+    clean:    Ember.OrderedSet.create(),
+    created:  Ember.OrderedSet.create(),
+    updated:  Ember.OrderedSet.create(),
+    deleted:  Ember.OrderedSet.create(),
+    inflight: Ember.OrderedSet.create()
+  });</p>
 
 <p>  set(this, 'relationships', Ember.OrderedSet.create());
 }
