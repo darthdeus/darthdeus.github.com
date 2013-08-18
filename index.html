@@ -9,9 +9,13 @@
   <meta name="author" content="Jakub Arnold">
 
   
-  <meta name="description" content="Ever since I saw the testing slides from EmberCamp I was thinking
-about testing. Up until now I&#8217;ve been using Capybara which is really
-really &hellip;">
+  <meta name="description" content="Connecting to a database 1
+2
+$ psql postgres # the default database
+$ psql database_name Connecting as a specific user 1
+2
+$ psql postgres john
+$ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +76,226 @@ really &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/08/19/postgresql-basics-by-example/">PostgreSQL Basics by Example</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-19T01:19:00+02:00" pubdate data-updated="true">Aug 19<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Connecting to a database</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ psql postgres     # the default database
+</span><span class='line'>$ psql database_name</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Connecting as a specific user</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ psql postgres john
+</span><span class='line'>$ psql -U john postgres</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Connecting to a host/port (by default <code>psql</code> uses a unix socket)</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ psql -h localhost -p 5432 postgres</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can also explicitly specify if you want to enter a password <code>-W</code> or not <code>-w</code></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ psql -w postgres
+</span><span class='line'>$ psql -W postgres
+</span><span class='line'>Password:</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once you&#8217;re inside <code>psql</code> you can control the database. Here&#8217;s a couple of handy commands</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>postgres=# \h                 # help on SQL commands
+</span><span class='line'>postgres=# \?                 # help on psql commands, such as \? and \h
+</span><span class='line'>postgres=# \l                 # list databases
+</span><span class='line'>postgres=# \c database_name   # connect to a database
+</span><span class='line'>postgres=# \d                 # list of tables
+</span><span class='line'>postgres=# \d table_name      # schema of a given table
+</span><span class='line'>postgres=# \du                # list roles
+</span><span class='line'>postgres=# \e                 # edit in $EDITOR</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At this point you can just type SQL statements and they&#8217;ll be executed on the database you&#8217;re currently
+connected to.</p>
+
+<h2>User Management</h2>
+
+<p>Once your application goes into production, or basically anywhere outside of your dev machine,
+you&#8217;re going to want to create some users and restrict access.</p>
+
+<p>We have two options for creating users, either from the shell via <code>createuser</code> or via SQL <code>CREATE ROLE</code></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ createuser john
+</span><span class='line'>postgres=# CREATE ROLE john;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>One thing to note here is that by default users created with <code>CREATE ROLE</code> can&#8217;t log in. To allow login you need to provide
+the <code>LOGIN</code> attribute</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>postgres=# CREATE ROLE john LOGIN;
+</span><span class='line'>postgres=# CREATE ROLE john WITH LOGIN; # the same as above
+</span><span class='line'>postgres=# CREATE USER john;            # alternative to CREATE ROLE which adds the LOGIN attribute</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can also add the <code>LOGIN</code> attribute with <code>ALTER ROLE</code></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>postgres=# ALTER ROLE john LOGIN;
+</span><span class='line'>postgres=# ALTER ROLE john NOLOGIN;   # remove login</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can also specify multiple attributes when using <code>CREATE ROLE</code> or <code>ALTER ROLE</code>, but bare in mind that <code>ALTER ROLE</code> doesn&#8217;t change the permissions the role already has which you don&#8217;t specify.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>postgres=# CREATE ROLE deploy SUPERUSER LOGIN;
+</span><span class='line'>CREATE ROLE
+</span><span class='line'>postgres=# ALTER ROLE deploy NOSUPERUSER CREATEDB;  # the LOGIN privilege is not touched here
+</span><span class='line'>ALTER ROLE
+</span><span class='line'>postgres=# \du deploy
+</span><span class='line'>           List of roles
+</span><span class='line'> Role name | Attributes | Member of
+</span><span class='line'>-----------+------------+-----------
+</span><span class='line'> deploy    | Create DB  | {}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There&#8217;s an alternative to <code>CREATE ROLE john WITH LOGIN</code>, and that&#8217;s <code>CREATE USER</code> which automatically creates the <code>LOGIN</code> permission. It is important to understand that users and roles are the same thing. In fact there&#8217;s no such thing as a user in PostgreSQL, only a role with LOGIN permission</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>postgres=# CREATE USER john;
+</span><span class='line'>CREATE ROLE
+</span><span class='line'>postgres=# CREATE ROLE kate;
+</span><span class='line'>CREATE ROLE
+</span><span class='line'>postgres=# \du
+</span><span class='line'>                             List of roles
+</span><span class='line'> Role name |                   Attributes                   | Member of
+</span><span class='line'>-----------+------------------------------------------------+-----------
+</span><span class='line'> darth     | Superuser, Create role, Create DB, Replication | {}
+</span><span class='line'> john      |                                                | {}
+</span><span class='line'> kate      | Cannot login                                   | {}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can also create groups via <code>CREATE GROUP</code> (which is now aliased to <code>CREATE ROLE</code>), and then grant or revoke
+access to other roles.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>postgres=# CREATE GROUP admin LOGIN;
+</span><span class='line'>CREATE ROLE
+</span><span class='line'>postgres=# GRANT admin TO john;
+</span><span class='line'>GRANT ROLE
+</span><span class='line'>postgres=# \du
+</span><span class='line'>                             List of roles
+</span><span class='line'> Role name |                   Attributes                   | Member of
+</span><span class='line'>-----------+------------------------------------------------+-----------
+</span><span class='line'> admin     |                                                | {}
+</span><span class='line'> darth     | Superuser, Create role, Create DB, Replication | {}
+</span><span class='line'> john      |                                                | {admin}
+</span><span class='line'> kate      | Cannot login                                   | {}
+</span><span class='line'>postgres=# REVOKE admin FROM john;
+</span><span class='line'>REVOKE ROLE
+</span><span class='line'>postgres=# \du
+</span><span class='line'>                             List of roles
+</span><span class='line'> Role name |                   Attributes                   | Member of
+</span><span class='line'>-----------+------------------------------------------------+-----------
+</span><span class='line'> admin     |                                                | {}
+</span><span class='line'> darth     | Superuser, Create role, Create DB, Replication | {}
+</span><span class='line'> john      |                                                | {}
+</span><span class='line'> kate      | Cannot login                                   | {}</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1586,412 +1810,6 @@ tests for concatenated properties</a>.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
-        <h1 class="entry-title"><a href="/blog/2013/01/27/ember-data-in-depth/">Ember Data in Depth</a></h1>
-      
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-01-27T13:52:00+01:00" pubdate data-updated="true">Jan 27<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is a guide explaining how Ember Data works internaly. My initial
-motivation for writing this is to understand Ember better myself. I&#8217;ve
-found that every time I understand something about how Ember works, it
-improves my application code.</p>
-
-<h2>Main parts</h2>
-
-<p>First we need to understand what are the main concepts. Let&#8217;s start with
-a simple example.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">App</span><span class="p">.</span><span class="nx">User</span> <span class="o">=</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">username</span><span class="o">:</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Let&#8217;s dive deep into this. There are four important concepts, two of
-which are basic Ember.js and we&#8217;re going to skip them</p>
-
-<ul>
-<li><code>App.User</code> represents a <code>User</code> class in the <code>App</code> namespace</li>
-<li><code>username</code> represents a property on the <code>User</code> class</li>
-</ul>
-
-
-<p>These are the basics and you should be familiar with them to understand
-the rest of this guide. Next we have <code>DS.Model</code> and <code>DS.attr</code>:</p>
-
-<h2>DS.Model and DS.attr</h2>
-
-<p><code>DS.Model</code> is one of the core concepts in Ember Data and it represents a
-single <em>resource</em>. Models can have relationships with other models,
-similar to how you&#8217;d model your data in a relational database. But let&#8217;s
-ignore that for now.</p>
-
-<p><code>DS.Model</code> is both a state machine and a promise. If you don&#8217;t
-understand what promises are, please take a look at <a href="https://gist.github.com/3889970">this awesome
-article</a> which explains them in depth.</p>
-
-<p>State machines are used throughout Ember and they basically represent something <em>which can have multiple states and can transition between the states</em>. For example <code>DS.Model</code> can have the following states (<em><a href="http://emberjs.com/guides/models/model-lifecycle/">taken from the official Ember guide</a></em>):</p>
-
-<ul>
-<li><code>isLoaded</code> - The adapter has finished retrieving the current state of the record from its backend.</li>
-<li><code>isDirty</code> - The record has local changes that have not yet been saved by the adapter. This includes records that have been created (but not yet saved) or deleted.</li>
-<li><code>isSaving</code> - The record has been sent to the adapter to have its changes saved to the backend, but the adapter has not yet confirmed that the changes were successful.</li>
-<li><code>isDeleted</code> - The record was marked for deletion. When <code>isDeleted</code> is true and <code>isDirty</code> is <code>true</code>, the record is deleted locally but the deletion was not yet persisted. When <code>isSaving</code> is true, the change is in-flight. When both <code>isDirty</code> and <code>isSaving</code> are <code>false</code>, the change has been saved.</li>
-<li><code>isError</code> - The adapter reported that it was unable to save local changes to the backend. This may also result in the record having its <code>isValid</code> property become false if the adapter reported that server-side validations failed.</li>
-<li><code>isNew</code> - The record was created locally and the adapter did not yet report that it was successfully saved.
-<code>isValid</code> No client-side validations have failed and the adapter did not report any server-side validation failures.</li>
-</ul>
-
-
-<p>We can also bind to these with event handlers, which will be explained later, but for now let&#8217;s just list them:</p>
-
-<ul>
-<li><code>didLoad</code></li>
-<li><code>didCreate</code></li>
-<li><code>didUpdate</code></li>
-<li><code>didDelete</code></li>
-<li><code>becameError</code></li>
-<li><code>becameInvalid</code></li>
-</ul>
-
-
-<p><em><a href="https://github.com/emberjs/data/blob/f274153754cb8b629cd98fc6c590f18bc8ee3ff6/packages/ember-data/lib/system/model/states.js#L223-L245">I would also encourage you to go take a look at the source documentation on GitHub</a></em></p>
-
-<p>It is important for us to understand what each state means, because they
-can affect how our application behaves. For example if we try to modify
-a record which is already being saved, we will get an exception saying
-something like this</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">Attempted</span> <span class="nx">to</span> <span class="nx">handle</span> <span class="nx">event</span> <span class="err">`</span><span class="nx">willSetProperty</span><span class="err">`</span> <span class="nx">on</span> <span class="o">&lt;</span><span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="o">:</span><span class="nx">ember1144</span><span class="o">:</span><span class="kc">null</span><span class="o">&gt;</span>
-</span><span class='line'><span class="k">while</span> <span class="k">in</span> <span class="nx">state</span> <span class="nx">rootState</span><span class="p">.</span><span class="nx">loaded</span><span class="p">.</span><span class="nx">created</span><span class="p">.</span><span class="nx">inFlight</span><span class="p">.</span> <span class="nx">Called</span> <span class="kd">with</span>
-</span><span class='line'><span class="p">{</span><span class="nx">reference</span><span class="o">:</span> <span class="p">[</span><span class="nx">object</span> <span class="nb">Object</span><span class="p">],</span> <span class="nx">store</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">App</span><span class="p">.</span><span class="nx">Store</span><span class="o">:</span><span class="nx">ember313</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">username</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The important part here is the <code>rootState.loaded.created.inFlight</code>. If
-we look at <a href="https://github.com/emberjs/data/blob/f274153754cb8b629cd98fc6c590f18bc8ee3ff6/packages/ember-data/lib/system/model/states.js#L254-L261">the source of <code>DirtyState</code></a>, we can see what this means</p>
-
-<blockquote><p>Dirty states have three child states:</p>
-
-<ul>
-<li><code>uncommitted</code>: the store has not yet handed off the record to be saved.</li>
-<li><code>inFlight</code>: the store has handed off the record to be saved, but the adapter has not yet acknowledged success.</li>
-<li><code>invalid</code>: the record has invalid information and cannot be send to the adapter yet.</li>
-</ul>
-</blockquote>
-
-<p>Let&#8217;s go through the record lifecycle and observe it&#8217;s state. We can do
-this by doing <code>.get("stateManager.currentState.name")</code></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">user</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;isLoaded&quot;</span><span class="p">)</span> <span class="c1">// =&gt; true</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;isDirty&quot;</span><span class="p">)</span> <span class="c1">// =&gt; false</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;stateManager.currentState.name&quot;</span><span class="p">)</span> <span class="c1">// =&gt; loaded</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;wycats&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;isLoaded&quot;</span><span class="p">)</span> <span class="c1">// =&gt; true</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;isDirty&quot;</span><span class="p">)</span> <span class="c1">// =&gt; true, which means comitting the transaction will save the record</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;stateManager.currentState.name&quot;</span><span class="p">)</span> <span class="c1">// =&gt; uncommitted</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;transaction&quot;</span><span class="p">).</span><span class="nx">commit</span><span class="p">()</span>
-</span><span class='line'><span class="c1">// while the record is being saved</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;stateManager.currentState.name&quot;</span><span class="p">)</span> <span class="c1">// =&gt; inFlight</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;isSaving&quot;</span><span class="p">)</span> <span class="c1">// =&gt; true</span>
-</span><span class='line'><span class="c1">// after the record was saved</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;stateManager.currentState.name&quot;</span><span class="p">)</span> <span class="c1">// =&gt; saved</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Transactions and <code>commit()</code></h2>
-
-<p>In the previous example, we&#8217;ve used <code>get("transaction").commit()</code> to
-persist the changes to the server. <code>.commit()</code> will take all <code>dirty</code>
-records in the transaction and persiste them to the server.</p>
-
-<p>A record becomes dirty whenever one of it&#8217;s attributes change. For
-example</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">user</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;isDirty&quot;</span><span class="p">)</span> <span class="c1">// =&gt; false</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;wycats&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;isDirty&quot;</span><span class="p">)</span> <span class="c1">// =&gt; true</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If we create a new record, it will be dirty by default</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">user</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">createRecord</span><span class="p">()</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;isDirty&quot;</span><span class="p">)</span> <span class="c1">// =&gt; true</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><a href="https://github.com/emberjs/data/pull/646">Currently there&#8217;s a regression</a>
-that we change an attribute to something else, and then back to the
-original value, the record will be marked as dirty.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">user</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'><span class="nx">originalUsername</span> <span class="o">=</span> <span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;isDirty&quot;</span><span class="p">)</span> <span class="c1">// =&gt; false</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;wycats&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;isDirty&quot;</span><span class="p">)</span> <span class="c1">// =&gt; true</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="nx">originalUsername</span><span class="p">)</span>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;isDirty&quot;</span><span class="p">)</span> <span class="c1">// =&gt; true, even though it should be false</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>But let&#8217;s hope this will be fixed soon.</p>
-
-<h2>Transactions</h2>
-
-<p>Until now we assumed that there is some <em>global</em> transaction which is
-the same for every single model. But this doesn&#8217;t have to be true. We
-can create our own transactions and manage them at our will.</p>
-
-<p>I recommend you take a look at <a href="https://github.com/emberjs/data/blob/master/packages/ember-data/tests/integration/transactions/basic_test.js">the tests for transactions in Ember Data
-repository</a>.
-They basically show all of the scenarios which you can encounter. For
-example</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">transaction</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">transaction</span><span class="p">();</span>
-</span><span class='line'><span class="nx">record</span> <span class="o">=</span> <span class="nx">transaction</span><span class="p">.</span><span class="nx">createRecord</span><span class="p">(</span><span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">,</span> <span class="p">{});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span> <span class="c1">// this will save the record to the server</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">record</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span> <span class="c1">// nothing is committed here, because the record</span>
-</span><span class='line'>                      <span class="c1">// is removed from the transaction when it is saved</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">store</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span> <span class="c1">// this will save the record properly</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We can also add a record to a transaction, which will remove it from the
-global transaction. Important thing to note here is that
-<a href="https://github.com/emberjs/data/blob/master/packages/ember-data/lib/system/store.js#L127-L129"><code>store.transaction()</code></a>
-<strong>always returns a new transaction</strong>.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">user</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-</span><span class='line'><span class="nx">transaction</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">transaction</span><span class="p">();</span>
-</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;wycats&quot;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">store</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span> <span class="c1">// nothing happens</span>
-</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span> <span class="c1">// user is saved</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Same goes for deleting records</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">user</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-</span><span class='line'><span class="nx">transaction</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">transaction</span><span class="p">();</span>
-</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">deleteRecord</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">store</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span> <span class="c1">// nothing happens</span>
-</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span> <span class="c1">// user is deleted</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We can also remove a record from a transaction</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">user</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">User</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-</span><span class='line'><span class="nx">transaction</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">transaction</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
-</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">user</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;wycats&quot;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">transaction</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span> <span class="c1">// nothing happens</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>One scenario when transactions can be useful is when you just need to
-change one record, without affecting changes to other records. You can
-put that change in a separate transaction, instead of just doing
-<code>store.commit()</code>.</p>
-
-<p>Important thing to note here is that there&#8217;s a <code>defaultTransaction</code> for
-the store to which you can get via <code>store.get("defaultTransaction")</code>.
-This is where all of the records are placed, unless you explicitly
-create a new transaction and assign a record to it.</p>
-
-<p>These two are completely equivalent</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">store</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span>
-</span><span class='line'><span class="nx">store</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;defaultTransaction&quot;</span><span class="p">).</span><span class="nx">commit</span><span class="p">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Just take a look at how <code>store.commit()</code> is defined</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">commit</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">get</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&#39;defaultTransaction&#39;</span><span class="p">).</span><span class="nx">commit</span><span class="p">();</span>
-</span><span class='line'><span class="p">},</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2><code>commit()</code></h2>
-
-<p>Now that we understand how transactions work, let&#8217;s dig deep into
-<code>store.commit()</code>. First thing we need to understand here is that Ember
-Transactions use this thing called <code>bucket</code> to store records with
-various states in. This is first initialized in the <a href="https://github.com/emberjs/data/blob/master/packages/ember-data/lib/system/transaction.js#L91-L101"><code>init</code> method of
-<code>DS.Transaction</code></a></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">init</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&#39;buckets&#39;</span><span class="p">,</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">clean</span><span class="o">:</span>    <span class="nx">Ember</span><span class="p">.</span><span class="nx">OrderedSet</span><span class="p">.</span><span class="nx">create</span><span class="p">(),</span>
-</span><span class='line'>    <span class="nx">created</span><span class="o">:</span>  <span class="nx">Ember</span><span class="p">.</span><span class="nx">OrderedSet</span><span class="p">.</span><span class="nx">create</span><span class="p">(),</span>
-</span><span class='line'>    <span class="nx">updated</span><span class="o">:</span>  <span class="nx">Ember</span><span class="p">.</span><span class="nx">OrderedSet</span><span class="p">.</span><span class="nx">create</span><span class="p">(),</span>
-</span><span class='line'>    <span class="nx">deleted</span><span class="o">:</span>  <span class="nx">Ember</span><span class="p">.</span><span class="nx">OrderedSet</span><span class="p">.</span><span class="nx">create</span><span class="p">(),</span>
-</span><span class='line'>    <span class="nx">inflight</span><span class="o">:</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">OrderedSet</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&#39;relationships&#39;</span><span class="p">,</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">OrderedSet</span><span class="p">.</span><span class="nx">create</span><span class="p">());</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Each bucket represents one state in which a record can possibly be.
-These are used in many different places in the transaction, and every
-time a method changes it&#8217;s state, it will be moved to a corresponding
-bucket</p>
-
-<figure class='code'><figcaption><span>Example of recordBecameDirty</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">recordBecameDirty</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">bucketType</span><span class="p">,</span> <span class="nx">record</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">removeFromBucket</span><span class="p">(</span><span class="s1">&#39;clean&#39;</span><span class="p">,</span> <span class="nx">record</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">addToBucket</span><span class="p">(</span><span class="nx">bucketType</span><span class="p">,</span> <span class="nx">record</span><span class="p">);</span>
-</span><span class='line'><span class="p">},</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>More content will be coming soon</strong></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -2007,6 +1825,10 @@ bucket</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/08/19/postgresql-basics-by-example/">PostgreSQL Basics by Example</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/02/19/testing-ember-dot-js-part-1/">Testing Ember.js - part 1</a>
       </li>
     
@@ -2020,10 +1842,6 @@ bucket</p>
     
       <li class="post">
         <a href="/blog/2013/02/02/using-transactions-in-ember-data/">Using Transactions in Ember Data - part 1</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention/">Ember.js Router and Template Naming Convention</a>
       </li>
     
   </ul>
