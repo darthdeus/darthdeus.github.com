@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Testing | darthdeus blog]]></title>
-  <link href="http://darthdeus.github.com/blog/categories/testing/atom.xml" rel="self"/>
-  <link href="http://darthdeus.github.com/"/>
-  <updated>2013-08-19T01:38:19+02:00</updated>
-  <id>http://darthdeus.github.com/</id>
+  <title><![CDATA[Category: Testing | darthdeus' blog]]></title>
+  <link href="http://darthdeus.github.io/blog/categories/testing/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.io/"/>
+  <updated>2013-08-19T11:29:18+02:00</updated>
+  <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Testing Ember.js - part 1]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/02/19/testing-ember-dot-js-part-1/"/>
+    <link href="http://darthdeus.github.io/blog/2013/02/19/testing-ember-dot-js-part-1/"/>
     <updated>2013-02-19T19:05:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/02/19/testing-ember-dot-js-part-1</id>
+    <id>http://darthdeus.github.io/blog/2013/02/19/testing-ember-dot-js-part-1</id>
     <content type="html"><![CDATA[<p>Ever since I saw the <em>testing</em> slides from EmberCamp I was thinking
 about testing. Up until now I've been using Capybara which is really
 really really slow.</p>

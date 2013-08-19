@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: core | darthdeus blog]]></title>
-  <link href="http://darthdeus.github.com/blog/categories/core/atom.xml" rel="self"/>
-  <link href="http://darthdeus.github.com/"/>
-  <updated>2013-08-19T01:38:19+02:00</updated>
-  <id>http://darthdeus.github.com/</id>
+  <title><![CDATA[Category: core | darthdeus' blog]]></title>
+  <link href="http://darthdeus.github.io/blog/categories/core/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.io/"/>
+  <updated>2013-08-19T11:29:18+02:00</updated>
+  <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Concatenated Properties]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/01/27/concatenated-properties/"/>
+    <link href="http://darthdeus.github.io/blog/2013/01/27/concatenated-properties/"/>
     <updated>2013-01-27T18:18:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/01/27/concatenated-properties</id>
+    <id>http://darthdeus.github.io/blog/2013/01/27/concatenated-properties</id>
     <content type="html"><![CDATA[<p>As some of you might now, Ember provides you with something called
 <em>concatenated property</em>. Their main use case is internal, which means
 you are unlikely to have the need to use them in your own application.

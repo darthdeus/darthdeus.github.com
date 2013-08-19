@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Transactions | darthdeus blog]]></title>
-  <link href="http://darthdeus.github.com/blog/categories/transactions/atom.xml" rel="self"/>
-  <link href="http://darthdeus.github.com/"/>
-  <updated>2013-08-19T01:38:19+02:00</updated>
-  <id>http://darthdeus.github.com/</id>
+  <title><![CDATA[Category: Transactions | darthdeus' blog]]></title>
+  <link href="http://darthdeus.github.io/blog/categories/transactions/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.io/"/>
+  <updated>2013-08-19T11:29:18+02:00</updated>
+  <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Using Transactions in Ember Data - part 1]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data/"/>
+    <link href="http://darthdeus.github.io/blog/2013/02/02/using-transactions-in-ember-data/"/>
     <updated>2013-02-02T14:15:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data</id>
+    <id>http://darthdeus.github.io/blog/2013/02/02/using-transactions-in-ember-data</id>
     <content type="html"><![CDATA[<p>We talked about transactions in <a href="http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/">one of the previous articles</a>
 (read it if you haven't already), but we didn't really touch on when to
 use them in real world. One of the most common use cases for me is when

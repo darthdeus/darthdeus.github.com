@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[darthdeus blog]]></title>
-  <link href="http://darthdeus.github.com/atom.xml" rel="self"/>
-  <link href="http://darthdeus.github.com/"/>
-  <updated>2013-08-19T01:38:19+02:00</updated>
-  <id>http://darthdeus.github.com/</id>
+  <title><![CDATA[darthdeus' blog]]></title>
+  <link href="http://darthdeus.github.io/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.io/"/>
+  <updated>2013-08-19T11:29:18+02:00</updated>
+  <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[PostgreSQL Basics by Example]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/08/19/postgresql-basics-by-example/"/>
+    <link href="http://darthdeus.github.io/blog/2013/08/19/postgresql-basics-by-example/"/>
     <updated>2013-08-19T01:19:00+02:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/08/19/postgresql-basics-by-example</id>
+    <id>http://darthdeus.github.io/blog/2013/08/19/postgresql-basics-by-example</id>
     <content type="html"><![CDATA[<p>Connecting to a database</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -206,9 +206,9 @@ access to other roles.</p>
   
   <entry>
     <title type="html"><![CDATA[Testing Ember.js - part 1]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/02/19/testing-ember-dot-js-part-1/"/>
+    <link href="http://darthdeus.github.io/blog/2013/02/19/testing-ember-dot-js-part-1/"/>
     <updated>2013-02-19T19:05:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/02/19/testing-ember-dot-js-part-1</id>
+    <id>http://darthdeus.github.io/blog/2013/02/19/testing-ember-dot-js-part-1</id>
     <content type="html"><![CDATA[<p>Ever since I saw the <em>testing</em> slides from EmberCamp I was thinking
 about testing. Up until now I&#8217;ve been using Capybara which is really
 really really slow.</p>
@@ -368,9 +368,9 @@ full featured testing framework.</p>
   
   <entry>
     <title type="html"><![CDATA[render, control, partial, view, template]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/02/10/render-control-partial-view/"/>
+    <link href="http://darthdeus.github.io/blog/2013/02/10/render-control-partial-view/"/>
     <updated>2013-02-10T21:29:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/02/10/render-control-partial-view</id>
+    <id>http://darthdeus.github.io/blog/2013/02/10/render-control-partial-view</id>
     <content type="html"><![CDATA[<p>There are many ways one can DRY up templates when using Ember.js, it all
 depends on what you&#8217;re trying to achieve.</p>
 
@@ -418,9 +418,9 @@ issues there are with it.</p>
   
   <entry>
     <title type="html"><![CDATA[Router Request Lifecycle]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/02/08/router-request-lifecycle/"/>
+    <link href="http://darthdeus.github.io/blog/2013/02/08/router-request-lifecycle/"/>
     <updated>2013-02-08T16:59:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/02/08/router-request-lifecycle</id>
+    <id>http://darthdeus.github.io/blog/2013/02/08/router-request-lifecycle</id>
     <content type="html"><![CDATA[<p>Router is the core part of Ember. Every time we go to a new URL it means
 the
 route object is called with our params and stuff. These are the hooks
@@ -678,9 +678,9 @@ content properly set.</p>
   
   <entry>
     <title type="html"><![CDATA[Using Transactions in Ember Data - part 1]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data/"/>
+    <link href="http://darthdeus.github.io/blog/2013/02/02/using-transactions-in-ember-data/"/>
     <updated>2013-02-02T14:15:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data</id>
+    <id>http://darthdeus.github.io/blog/2013/02/02/using-transactions-in-ember-data</id>
     <content type="html"><![CDATA[<p>We talked about transactions in <a href="http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/">one of the previous articles</a>
 (read it if you haven&#8217;t already), but we didn&#8217;t really touch on when to
 use them in real world. One of the most common use cases for me is when
@@ -773,9 +773,9 @@ This happens almost every time you have two forms displayed at once.</p>
   
   <entry>
     <title type="html"><![CDATA[Ember.js Router and Template Naming Convention]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention/"/>
+    <link href="http://darthdeus.github.io/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention/"/>
     <updated>2013-02-01T19:43:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention</id>
+    <id>http://darthdeus.github.io/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention</id>
     <content type="html"><![CDATA[<p>Ever since the change to <code>resource</code> and <code>route</code> a lot of people are
 confused about the meaning of the two and how they affect naming. Here&#8217;s
 the difference:</p>
@@ -1038,9 +1038,9 @@ since this is a completely essential part of Ember.js.</p>
   
   <entry>
     <title type="html"><![CDATA[How to find a model by any attribute in Ember.js]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js/"/>
+    <link href="http://darthdeus.github.io/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js/"/>
     <updated>2013-01-31T23:13:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js</id>
+    <id>http://darthdeus.github.io/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js</id>
     <content type="html"><![CDATA[<p>One of the common things people ask about Ember Data is how to find a
 single record by it&#8217;s attribute. This is because the current revision
 (11) only offers three methods of fetching records</p>
@@ -1139,9 +1139,9 @@ the data and Ember will take care of the rest.</p>
   
   <entry>
     <title type="html"><![CDATA[Controller, ObjectController and ObjectProxy]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy/"/>
+    <link href="http://darthdeus.github.io/blog/2013/01/27/controller-objectcontroller-and-objectproxy/"/>
     <updated>2013-01-27T19:24:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy</id>
+    <id>http://darthdeus.github.io/blog/2013/01/27/controller-objectcontroller-and-objectproxy</id>
     <content type="html"><![CDATA[<p>When you first come to Ember, you&#8217;ll soon stumble upon three things:</p>
 
 <ul>
@@ -1230,9 +1230,9 @@ over <code>Ember.Controller</code>, unless you know what you&#8217;re doing :)</
   
   <entry>
     <title type="html"><![CDATA[State Manager and Friends - part 1]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/01/27/state-manager-and-friends/"/>
+    <link href="http://darthdeus.github.io/blog/2013/01/27/state-manager-and-friends/"/>
     <updated>2013-01-27T19:23:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/01/27/state-manager-and-friends</id>
+    <id>http://darthdeus.github.io/blog/2013/01/27/state-manager-and-friends</id>
     <content type="html"><![CDATA[<p>Since state management is such a huge part of Ember.js it desrves a
 dedicated article. I&#8217;m not going to explain the old router which used
 <code>Ember.StateManager</code> to do it&#8217;s bidding. Those days are over and we
@@ -1388,9 +1388,9 @@ some specific examples in the second part of this artcile.</p>
   
   <entry>
     <title type="html"><![CDATA[Concatenated Properties]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/01/27/concatenated-properties/"/>
+    <link href="http://darthdeus.github.io/blog/2013/01/27/concatenated-properties/"/>
     <updated>2013-01-27T18:18:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/01/27/concatenated-properties</id>
+    <id>http://darthdeus.github.io/blog/2013/01/27/concatenated-properties</id>
     <content type="html"><![CDATA[<p>As some of you might now, Ember provides you with something called
 <em>concatenated property</em>. Their main use case is internal, which means
 you are unlikely to have the need to use them in your own application.
@@ -1458,9 +1458,9 @@ tests for concatenated properties</a>.</p>
   
   <entry>
     <title type="html"><![CDATA[Ember Data in Depth]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/"/>
+    <link href="http://darthdeus.github.io/blog/2013/01/27/ember-data-in-depth/"/>
     <updated>2013-01-27T13:52:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth</id>
+    <id>http://darthdeus.github.io/blog/2013/01/27/ember-data-in-depth</id>
     <content type="html"><![CDATA[<p>This is a guide explaining how Ember Data works internaly. My initial
 motivation for writing this is to understand Ember better myself. I&#8217;ve
 found that every time I understand something about how Ember works, it
@@ -1835,9 +1835,9 @@ bucket</p>
   
   <entry>
     <title type="html"><![CDATA[Controller's Needs Explained]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/01/27/controllers-needs-explained/"/>
+    <link href="http://darthdeus.github.io/blog/2013/01/27/controllers-needs-explained/"/>
     <updated>2013-01-27T11:53:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/01/27/controllers-needs-explained</id>
+    <id>http://darthdeus.github.io/blog/2013/01/27/controllers-needs-explained</id>
     <content type="html"><![CDATA[<p>Since the v2 router came it became clear that using global singleton
 controllers like <code>App.userController = App.UserController.create()</code> is
 not the way to go. This prevents us from doing a simple binding like</p>

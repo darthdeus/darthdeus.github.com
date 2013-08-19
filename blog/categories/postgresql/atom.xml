@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: postgresql | darthdeus blog]]></title>
-  <link href="http://darthdeus.github.com/blog/categories/postgresql/atom.xml" rel="self"/>
-  <link href="http://darthdeus.github.com/"/>
-  <updated>2013-08-19T01:38:19+02:00</updated>
-  <id>http://darthdeus.github.com/</id>
+  <title><![CDATA[Category: postgresql | darthdeus' blog]]></title>
+  <link href="http://darthdeus.github.io/blog/categories/postgresql/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.io/"/>
+  <updated>2013-08-19T11:29:18+02:00</updated>
+  <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[PostgreSQL Basics by Example]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/08/19/postgresql-basics-by-example/"/>
+    <link href="http://darthdeus.github.io/blog/2013/08/19/postgresql-basics-by-example/"/>
     <updated>2013-08-19T01:19:00+02:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/08/19/postgresql-basics-by-example</id>
+    <id>http://darthdeus.github.io/blog/2013/08/19/postgresql-basics-by-example</id>
     <content type="html"><![CDATA[<p>Connecting to a database</p>
 
 <pre><code>$ psql postgres     # the default database

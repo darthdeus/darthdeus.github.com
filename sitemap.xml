@@ -1,73 +1,73 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
-        <loc>http://darthdeus.github.com/blog/2013/01/27/controllers-needs-explained/</loc>
-        <lastmod>2013-08-19T01:27:11+02:00</lastmod>
+        <loc>http://darthdeus.github.io/blog/2013/01/27/controllers-needs-explained/</loc>
+        <lastmod>2013-08-19T02:25:59+02:00</lastmod>
     </url>
     <url>
-        <loc>http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/</loc>
-        <lastmod>2013-08-19T01:27:11+02:00</lastmod>
+        <loc>http://darthdeus.github.io/blog/2013/01/27/ember-data-in-depth/</loc>
+        <lastmod>2013-08-19T02:25:59+02:00</lastmod>
     </url>
     <url>
-        <loc>http://darthdeus.github.com/blog/2013/01/27/concatenated-properties/</loc>
-        <lastmod>2013-08-19T01:27:11+02:00</lastmod>
+        <loc>http://darthdeus.github.io/blog/2013/01/27/concatenated-properties/</loc>
+        <lastmod>2013-08-19T02:25:59+02:00</lastmod>
     </url>
     <url>
-        <loc>http://darthdeus.github.com/blog/2013/01/27/state-manager-and-friends/</loc>
-        <lastmod>2013-08-19T01:27:11+02:00</lastmod>
-    </url>
-    <url>
-        <loc>
-            http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy/
-        </loc>
-        <lastmod>2013-08-19T01:27:11+02:00</lastmod>
+        <loc>http://darthdeus.github.io/blog/2013/01/27/state-manager-and-friends/</loc>
+        <lastmod>2013-08-19T02:25:59+02:00</lastmod>
     </url>
     <url>
         <loc>
-            http://darthdeus.github.com/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js/
+            http://darthdeus.github.io/blog/2013/01/27/controller-objectcontroller-and-objectproxy/
         </loc>
-        <lastmod>2013-08-19T01:27:11+02:00</lastmod>
+        <lastmod>2013-08-19T02:25:59+02:00</lastmod>
     </url>
     <url>
         <loc>
-            http://darthdeus.github.com/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention/
+            http://darthdeus.github.io/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js/
         </loc>
-        <lastmod>2013-08-19T01:27:11+02:00</lastmod>
+        <lastmod>2013-08-19T02:25:59+02:00</lastmod>
     </url>
     <url>
-        <loc>http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data/</loc>
-        <lastmod>2013-08-19T01:27:11+02:00</lastmod>
+        <loc>
+            http://darthdeus.github.io/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention/
+        </loc>
+        <lastmod>2013-08-19T02:25:59+02:00</lastmod>
     </url>
     <url>
-        <loc>http://darthdeus.github.com/blog/2013/02/08/router-request-lifecycle/</loc>
-        <lastmod>2013-08-19T01:27:11+02:00</lastmod>
+        <loc>http://darthdeus.github.io/blog/2013/02/02/using-transactions-in-ember-data/</loc>
+        <lastmod>2013-08-19T02:25:59+02:00</lastmod>
     </url>
     <url>
-        <loc>http://darthdeus.github.com/blog/2013/02/10/render-control-partial-view/</loc>
-        <lastmod>2013-08-19T01:27:11+02:00</lastmod>
+        <loc>http://darthdeus.github.io/blog/2013/02/08/router-request-lifecycle/</loc>
+        <lastmod>2013-08-19T02:25:59+02:00</lastmod>
     </url>
     <url>
-        <loc>http://darthdeus.github.com/blog/2013/02/19/testing-ember-dot-js-part-1/</loc>
-        <lastmod>2013-08-19T01:27:11+02:00</lastmod>
+        <loc>http://darthdeus.github.io/blog/2013/02/10/render-control-partial-view/</loc>
+        <lastmod>2013-08-19T02:25:59+02:00</lastmod>
     </url>
     <url>
-        <loc>http://darthdeus.github.com/blog/2013/08/19/postgresql-basics-by-example/</loc>
-        <lastmod>2013-08-19T01:30:57+02:00</lastmod>
+        <loc>http://darthdeus.github.io/blog/2013/02/19/testing-ember-dot-js-part-1/</loc>
+        <lastmod>2013-08-19T02:25:59+02:00</lastmod>
     </url>
     <url>
-        <loc>http://darthdeus.github.com/404.html</loc>
+        <loc>http://darthdeus.github.io/blog/2013/08/19/postgresql-basics-by-example/</loc>
+        <lastmod>2013-08-19T02:25:59+02:00</lastmod>
+    </url>
+    <url>
+        <loc>http://darthdeus.github.io/404.html</loc>
         <lastmod>2013-01-28T21:42:59+01:00</lastmod>
     </url>
     <url>
-        <loc>http://darthdeus.github.com/blog/archives/</loc>
+        <loc>http://darthdeus.github.io/blog/archives/</loc>
         <lastmod>2013-08-19T01:30:57+02:00</lastmod>
     </url>
     <url>
-        <loc>http://darthdeus.github.com/</loc>
+        <loc>http://darthdeus.github.io/</loc>
         <lastmod>2013-08-19T01:30:57+02:00</lastmod>
     </url>
     <url>
-        <loc>http://darthdeus.github.com/robots.txt</loc>
+        <loc>http://darthdeus.github.io/robots.txt</loc>
         <lastmod>2013-01-27T11:46:42+01:00</lastmod>
     </url>
 </urlset>

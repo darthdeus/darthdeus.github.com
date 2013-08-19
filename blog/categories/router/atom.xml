@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Router | darthdeus blog]]></title>
-  <link href="http://darthdeus.github.com/blog/categories/router/atom.xml" rel="self"/>
-  <link href="http://darthdeus.github.com/"/>
-  <updated>2013-08-19T01:38:19+02:00</updated>
-  <id>http://darthdeus.github.com/</id>
+  <title><![CDATA[Category: Router | darthdeus' blog]]></title>
+  <link href="http://darthdeus.github.io/blog/categories/router/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.io/"/>
+  <updated>2013-08-19T11:29:18+02:00</updated>
+  <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Router Request Lifecycle]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/02/08/router-request-lifecycle/"/>
+    <link href="http://darthdeus.github.io/blog/2013/02/08/router-request-lifecycle/"/>
     <updated>2013-02-08T16:59:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/02/08/router-request-lifecycle</id>
+    <id>http://darthdeus.github.io/blog/2013/02/08/router-request-lifecycle</id>
     <content type="html"><![CDATA[<p>Router is the core part of Ember. Every time we go to a new URL it means
 the
 route object is called with our params and stuff. These are the hooks
@@ -210,9 +210,9 @@ content properly set.</p>
   
   <entry>
     <title type="html"><![CDATA[Ember.js Router and Template Naming Convention]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention/"/>
+    <link href="http://darthdeus.github.io/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention/"/>
     <updated>2013-02-01T19:43:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention</id>
+    <id>http://darthdeus.github.io/blog/2013/02/01/ember-dot-js-router-and-template-naming-convention</id>
     <content type="html"><![CDATA[<p>Ever since the change to <code>resource</code> and <code>route</code> a lot of people are
 confused about the meaning of the two and how they affect naming. Here's
 the difference:</p>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Templates | darthdeus blog]]></title>
-  <link href="http://darthdeus.github.com/blog/categories/templates/atom.xml" rel="self"/>
-  <link href="http://darthdeus.github.com/"/>
-  <updated>2013-08-19T01:38:19+02:00</updated>
-  <id>http://darthdeus.github.com/</id>
+  <title><![CDATA[Category: Templates | darthdeus' blog]]></title>
+  <link href="http://darthdeus.github.io/blog/categories/templates/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.io/"/>
+  <updated>2013-08-19T11:29:18+02:00</updated>
+  <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[render, control, partial, view, template]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/02/10/render-control-partial-view/"/>
+    <link href="http://darthdeus.github.io/blog/2013/02/10/render-control-partial-view/"/>
     <updated>2013-02-10T21:29:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/02/10/render-control-partial-view</id>
+    <id>http://darthdeus.github.io/blog/2013/02/10/render-control-partial-view</id>
     <content type="html"><![CDATA[<p>There are many ways one can DRY up templates when using Ember.js, it all
 depends on what you're trying to achieve.</p>
 

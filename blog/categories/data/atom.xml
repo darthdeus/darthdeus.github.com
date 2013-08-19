@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Data | darthdeus blog]]></title>
-  <link href="http://darthdeus.github.com/blog/categories/data/atom.xml" rel="self"/>
-  <link href="http://darthdeus.github.com/"/>
-  <updated>2013-08-19T01:38:19+02:00</updated>
-  <id>http://darthdeus.github.com/</id>
+  <title><![CDATA[Category: Data | darthdeus' blog]]></title>
+  <link href="http://darthdeus.github.io/blog/categories/data/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.io/"/>
+  <updated>2013-08-19T11:29:18+02:00</updated>
+  <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Using Transactions in Ember Data - part 1]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data/"/>
+    <link href="http://darthdeus.github.io/blog/2013/02/02/using-transactions-in-ember-data/"/>
     <updated>2013-02-02T14:15:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/02/02/using-transactions-in-ember-data</id>
+    <id>http://darthdeus.github.io/blog/2013/02/02/using-transactions-in-ember-data</id>
     <content type="html"><![CDATA[<p>We talked about transactions in <a href="http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/">one of the previous articles</a>
 (read it if you haven't already), but we didn't really touch on when to
 use them in real world. One of the most common use cases for me is when
@@ -86,9 +86,9 @@ This happens almost every time you have two forms displayed at once.</p>
   
   <entry>
     <title type="html"><![CDATA[How to find a model by any attribute in Ember.js]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js/"/>
+    <link href="http://darthdeus.github.io/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js/"/>
     <updated>2013-01-31T23:13:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js</id>
+    <id>http://darthdeus.github.io/blog/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js</id>
     <content type="html"><![CDATA[<p>One of the common things people ask about Ember Data is how to find a
 single record by it's attribute. This is because the current revision
 (11) only offers three methods of fetching records</p>
@@ -177,9 +177,9 @@ the data and Ember will take care of the rest.</p>
   
   <entry>
     <title type="html"><![CDATA[Ember Data in Depth]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth/"/>
+    <link href="http://darthdeus.github.io/blog/2013/01/27/ember-data-in-depth/"/>
     <updated>2013-01-27T13:52:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/01/27/ember-data-in-depth</id>
+    <id>http://darthdeus.github.io/blog/2013/01/27/ember-data-in-depth</id>
     <content type="html"><![CDATA[<p>This is a guide explaining how Ember Data works internaly. My initial
 motivation for writing this is to understand Ember better myself. I've
 found that every time I understand something about how Ember works, it

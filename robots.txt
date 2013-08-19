@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://darthdeus.github.com/sitemap.xml 
+Sitemap: http://darthdeus.github.io/sitemap.xml 

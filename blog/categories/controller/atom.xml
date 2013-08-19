@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: controller | darthdeus blog]]></title>
-  <link href="http://darthdeus.github.com/blog/categories/controller/atom.xml" rel="self"/>
-  <link href="http://darthdeus.github.com/"/>
-  <updated>2013-08-19T01:38:19+02:00</updated>
-  <id>http://darthdeus.github.com/</id>
+  <title><![CDATA[Category: controller | darthdeus' blog]]></title>
+  <link href="http://darthdeus.github.io/blog/categories/controller/atom.xml" rel="self"/>
+  <link href="http://darthdeus.github.io/"/>
+  <updated>2013-08-19T11:29:18+02:00</updated>
+  <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Controller, ObjectController and ObjectProxy]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy/"/>
+    <link href="http://darthdeus.github.io/blog/2013/01/27/controller-objectcontroller-and-objectproxy/"/>
     <updated>2013-01-27T19:24:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/01/27/controller-objectcontroller-and-objectproxy</id>
+    <id>http://darthdeus.github.io/blog/2013/01/27/controller-objectcontroller-and-objectproxy</id>
     <content type="html"><![CDATA[<p>When you first come to Ember, you'll soon stumble upon three things:</p>
 
 <ul>
@@ -83,9 +83,9 @@ over <code>Ember.Controller</code>, unless you know what you're doing :)</p>
   
   <entry>
     <title type="html"><![CDATA[Controller's Needs Explained]]></title>
-    <link href="http://darthdeus.github.com/blog/2013/01/27/controllers-needs-explained/"/>
+    <link href="http://darthdeus.github.io/blog/2013/01/27/controllers-needs-explained/"/>
     <updated>2013-01-27T11:53:00+01:00</updated>
-    <id>http://darthdeus.github.com/blog/2013/01/27/controllers-needs-explained</id>
+    <id>http://darthdeus.github.io/blog/2013/01/27/controllers-needs-explained</id>
     <content type="html"><![CDATA[<p>Since the v2 router came it became clear that using global singleton
 controllers like <code>App.userController = App.UserController.create()</code> is
 not the way to go. This prevents us from doing a simple binding like</p>
