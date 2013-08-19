@@ -4,7 +4,7 @@
   <title><![CDATA[Category: controller | darthdeus' blog]]></title>
   <link href="http://darthdeus.github.io/blog/categories/controller/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.io/"/>
-  <updated>2013-08-19T11:29:18+02:00</updated>
+  <updated>2013-08-19T11:42:26+02:00</updated>
   <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -67,9 +67,10 @@ proxy = Ember.ObjectProxy.create();
 proxy.set("foo", "bar"); // raises the following exception
 </code></p>
 
-<pre><code>Cannot delegate set('foo', bar) to the 'content' property
+<p><code>
+Cannot delegate set('foo', bar) to the 'content' property
 of object proxy &lt;Ember.ObjectProxy:ember420&gt;: its 'content' is undefined.
-</code></pre>
+</code></p>
 
 <p>I've stumbled upon this in one scenario, where I didn't set content for
 my <code>ObjectController</code>, but I tried to modify one of it's properties.
@@ -101,13 +102,16 @@ with the new router though. It will create the instance for us. One way
 we can use this is with <code>this.controllerFor</code>, which can be used inside
 of a route.</p>
 
-<p><code>javascript
+<p>```javascript
 App.UserRoute = Ember.Route.extend({
-  setupController: function(controller, model) {
-    // some magic with `this.controllerFor("user")`
-  }
+  setupController: function(controller, model) {</p>
+
+<pre><code>// some magic with `this.controllerFor("user")`
+</code></pre>
+
+<p>  }
 })
-</code></p>
+```</p>
 
 <p>but since this method is only available on the route and not inside a
 controller, it wasn't very pleasant to specify dependencies (or needs)
@@ -137,13 +141,16 @@ this</p>
 
 <p>Needs become incredibly useful when you have nested routes, for example</p>
 
-<p><code>javascript
+<p>```javascript
 App.Router.map(function() {
-  this.resource("post", { path: "/posts/:post_id" }, function() {
-    this.route("edit", { path: "/edit" });
-  });
+  this.resource("post", { path: "/posts/:post_id" }, function() {</p>
+
+<pre><code>this.route("edit", { path: "/edit" });
+</code></pre>
+
+<p>  });
 });
-</code></p>
+```</p>
 
 <p>In this case we will get <code>post</code>, <code>post.index</code> and <code>post.edit</code>. If you go
 to <code>/posts/1</code> you expect to get <code>post.index</code> template, which is true,

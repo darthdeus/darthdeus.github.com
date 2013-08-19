@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Testing | darthdeus' blog]]></title>
   <link href="http://darthdeus.github.io/blog/categories/testing/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.io/"/>
-  <updated>2013-08-19T11:29:18+02:00</updated>
+  <updated>2013-08-19T11:42:26+02:00</updated>
   <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -39,9 +39,12 @@ from the <code>Ember.View</code> tests</p>
 view = Ember.ContainerView.create({
   childViews: ["child"],</p>
 
-<p>  child: Ember.View.create({
-    tagName: 'aside'
-  })
+<p>  child: Ember.View.create({</p>
+
+<pre><code>tagName: 'aside'
+</code></pre>
+
+<p>  })
 });</p>
 
 <p>Ember.run(function(){
@@ -74,21 +77,27 @@ Ember.run(function() {
 
 <p>App.Store = DS.Store.extend({
   revision: 11,
-  adapter: DS.FixtureAdapter.extend({
-    // This will make the FixtureAdapter do everything synchronously
-    // instead of using setTimeout, which is vital because setTimeout
-    // happens outside of the runloop.
-    simulateRemoteResponse: false
-  })
+  adapter: DS.FixtureAdapter.extend({</p>
+
+<pre><code>// This will make the FixtureAdapter do everything synchronously
+// instead of using setTimeout, which is vital because setTimeout
+// happens outside of the runloop.
+simulateRemoteResponse: false
+</code></pre>
+
+<p>  })
 });</p>
 
 <p>App.User = DS.Model.extend({ name: DS.attr("string")});
 App.User.FIXTURES = [ { id: 1, name: "brohuda" }];</p>
 
 <p>App.HomeRoute = Ember.Route.extend({
-  model: function() {
-    return App.User.find(1);
-  }
+  model: function() {</p>
+
+<pre><code>return App.User.find(1);
+</code></pre>
+
+<p>  }
 });</p>
 
 <p>// Enabling Ember.testing will also disable automatic initialization,
@@ -107,9 +116,10 @@ and what doesn't :)</p>
 
 <p>If you see</p>
 
-<pre><code>assertion failed: You have turned on testing mode, which disabled the run-loop's autorun.
+<p><code>
+assertion failed: You have turned on testing mode, which disabled the run-loop's autorun.
 You will need to wrap any code with asynchronous side-effects in an Ember.run
-</code></pre>
+</code></p>
 
 <p>it means that you forgot to wrap something in <code>Ember.run</code>. I hope this
 is a good enough introduction. In one of the upcoming articles we'll
