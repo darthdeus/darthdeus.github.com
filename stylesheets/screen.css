@@ -28,3 +28,35 @@ border: none;
     .call-to-action a span {
       float: left;
       margin-top: 2px; }
+
+
+aside.sidebar .trackets {
+  margin-bottom: 100px;
+}
+
+aside.sidebar .trackets img {
+  border: none;
+  box-shadow: none;
+}
+
+aside.sidebar .trackets p.trackets-cta {
+  text-align: center;
+  padding: 5px;
+}
+
+aside.sidebar .trackets  a {
+  background: #1ABC9C;
+  color: #fff;
+  font-size: 18px;
+  padding: 20px 40px;
+  border-radius: 5px;
+  text-shadow: none;
+}
+
+aside.sidebar .trackets a:hover {
+  color: #fff;
+  text-decoration: none;
+  background: #32C9AB;
+}
+
+
