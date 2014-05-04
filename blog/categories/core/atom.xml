@@ -4,7 +4,7 @@
   <title><![CDATA[Category: core | darthdeus' blog]]></title>
   <link href="http://darthdeus.github.io/blog/categories/core/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.io/"/>
-  <updated>2014-02-09T00:02:20+01:00</updated>
+  <updated>2014-05-04T15:49:32+02:00</updated>
   <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -24,6 +24,12 @@ you are unlikely to have the need to use them in your own application.
 There are some places in Ember where you might be surprised by how
 things behave and this might be one of those. Let's start with an
 example.</p>
+
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/01/27/concatenated-properties.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/01/27/concatenated-properties.html" /></p>
 
 <p>```javascript
 App.UserView = Ember.View.extend({

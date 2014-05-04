@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Router | darthdeus' blog]]></title>
   <link href="http://darthdeus.github.io/blog/categories/router/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.io/"/>
-  <updated>2014-02-09T00:02:20+01:00</updated>
+  <updated>2014-05-04T15:49:32+02:00</updated>
   <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -19,9 +19,14 @@
     <updated>2013-02-08T16:59:00+01:00</updated>
     <id>http://darthdeus.github.io/blog/2013/02/08/router-request-lifecycle</id>
     <content type="html"><![CDATA[<p>Router is the core part of Ember. Every time we go to a new URL it means
-the
-route object is called with our params and stuff. These are the hooks
-sorted in order in which they are called</p>
+the route object is called with our params and stuff. These are the
+hooks sorted in order in which they are called</p>
+
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/02/08/router-request-lifecycle.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/02/08/router-request-lifecycle.html" /></p>
 
 <ul>
 <li>enter (private)</li>
@@ -245,6 +250,12 @@ the difference:</p>
 <p>Let's say we have a model <code>App.Post</code> and we want to show a list of posts
 and a new post form. There are many ways you can go about this, so let's
 start with the simplest.</p>
+
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/02/01/ember-dot-js-router-and-template-naming-convention.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/02/01/ember-dot-js-router-and-template-naming-convention.html" /></p>
 
 <p><code>javascript
 App.Router.map(function() {

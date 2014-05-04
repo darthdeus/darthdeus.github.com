@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ember | darthdeus' blog]]></title>
   <link href="http://darthdeus.github.io/blog/categories/ember/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.io/"/>
-  <updated>2014-02-09T00:02:20+01:00</updated>
+  <updated>2014-05-04T15:49:32+02:00</updated>
   <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -27,6 +27,12 @@ Instead we're going to go deep into the <code>Ember.StateManager</code>.</p>
 <p>In the general concept, state manager is basically some object which
 manages states and the transitions between them, thus representing a
 finite state machine.</p>
+
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/01/27/state-manager-and-friends.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/01/27/state-manager-and-friends.html" /></p>
 
 <p>Let's say we have a <code>Post</code> which can be in two states, <code>draft</code> and
 <code>published</code>. It begins it's life as a <code>draft</code> and when we <code>publish</code> it,
@@ -152,6 +158,12 @@ improves my application code.</p>
 
 <p>First we need to understand what are the main concepts. Let's start with
 a simple example.</p>
+
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/01/27/ember-data-in-depth.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/01/27/ember-data-in-depth.html" /></p>
 
 <p><code>javascript
 App.User = DS.Model.extend({

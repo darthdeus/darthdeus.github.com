@@ -4,7 +4,7 @@
   <title><![CDATA[darthdeus' blog]]></title>
   <link href="http://darthdeus.github.io/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.io/"/>
-  <updated>2014-02-09T00:02:20+01:00</updated>
+  <updated>2014-05-04T15:49:32+02:00</updated>
   <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -226,6 +226,12 @@ of the bindings before it finishes, which means you can render a view
 inside <code>Ember.run</code> and check the DOM right after that. Here&#8217;s an example
 from the <code>Ember.View</code> tests</p>
 
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/02/19/testing-ember-dot-js-part-1.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/02/19/testing-ember-dot-js-part-1.html" /></p>
+
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -374,6 +380,12 @@ full featured testing framework.</p>
     <content type="html"><![CDATA[<p>There are many ways one can DRY up templates when using Ember.js, it all
 depends on what you&#8217;re trying to achieve.</p>
 
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/02/10/render-control-partial-view.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/02/10/render-control-partial-view.html" /></p>
+
 <h2>partial &amp;&amp; template</h2>
 
 <p><code>{{partial "foo"}}</code> will take a template
@@ -422,9 +434,14 @@ issues there are with it.</p>
     <updated>2013-02-08T16:59:00+01:00</updated>
     <id>http://darthdeus.github.io/blog/2013/02/08/router-request-lifecycle</id>
     <content type="html"><![CDATA[<p>Router is the core part of Ember. Every time we go to a new URL it means
-the
-route object is called with our params and stuff. These are the hooks
-sorted in order in which they are called</p>
+the route object is called with our params and stuff. These are the
+hooks sorted in order in which they are called</p>
+
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/02/08/router-request-lifecycle.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/02/08/router-request-lifecycle.html" /></p>
 
 <ul>
 <li>enter (private)</li>
@@ -689,6 +706,12 @@ happening on the page.</p>
 
 <p>Adding a record to a transaction is simple</p>
 
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/02/02/using-transactions-in-ember-data.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/02/02/using-transactions-in-ember-data.html" /></p>
+
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -789,6 +812,12 @@ the difference:</p>
 <p>Let&#8217;s say we have a model <code>App.Post</code> and we want to show a list of posts
 and a new post form. There are many ways you can go about this, so let&#8217;s
 start with the simplest.</p>
+
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/02/01/ember-dot-js-router-and-template-naming-convention.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/02/01/ember-dot-js-router-and-template-naming-convention.html" /></p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -1054,6 +1083,14 @@ single record by it&#8217;s attribute. This is because the current revision
 </span></code></pre></td></tr></table></div></figure>
 
 
+
+
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/01/31/how-to-find-a-model-by-any-attribute-in-ember-dot-js.html" /></p>
+
 <p>If you want to search for a user by his username, you have two options</p>
 
 <h2>Using .find with <em>smart</em> server side</h2>
@@ -1243,6 +1280,12 @@ Instead we&#8217;re going to go deep into the <code>Ember.StateManager</code>.</
 manages states and the transitions between them, thus representing a
 finite state machine.</p>
 
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/01/27/state-manager-and-friends.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/01/27/state-manager-and-friends.html" /></p>
+
 <p>Let&#8217;s say we have a <code>Post</code> which can be in two states, <code>draft</code> and
 <code>published</code>. It begins it&#8217;s life as a <code>draft</code> and when we <code>publish</code> it,
 it should send out a notification email. The way Ember would handle this
@@ -1398,6 +1441,12 @@ There are some places in Ember where you might be surprised by how
 things behave and this might be one of those. Let&#8217;s start with an
 example.</p>
 
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/01/27/concatenated-properties.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/01/27/concatenated-properties.html" /></p>
+
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -1470,6 +1519,12 @@ improves my application code.</p>
 
 <p>First we need to understand what are the main concepts. Let&#8217;s start with
 a simple example.</p>
+
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/01/27/ember-data-in-depth.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/01/27/ember-data-in-depth.html" /></p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -1850,6 +1905,14 @@ not the way to go. This prevents us from doing a simple binding like</p>
 </span><span class='line'><span class="p">})</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+
+
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.trackets.com/2013/01/27/controllers-needs-explained.html">
+<link rel="canonical" href="http://blog.trackets.com/2013/01/27/controllers-needs-explained.html" /></p>
 
 <p>There is no need or even possibility to manage the controller instances
 with the new router though. It will create the instance for us. One way
