@@ -103,175 +103,14 @@ $ &hellip;">
 </span><span class='line'>$ psql -U john postgres</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Connecting to a host/port (by default <code>psql</code> uses a unix socket)</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ psql -h localhost -p 5432 postgres</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You can also explicitly specify if you want to enter a password <code>-W</code> or not <code>-w</code></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ psql -w postgres
-</span><span class='line'>$ psql -W postgres
-</span><span class='line'>Password:</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Once you&#8217;re inside <code>psql</code> you can control the database. Here&#8217;s a couple of handy commands</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>postgres=# \h                 # help on SQL commands
-</span><span class='line'>postgres=# \?                 # help on psql commands, such as \? and \h
-</span><span class='line'>postgres=# \l                 # list databases
-</span><span class='line'>postgres=# \c database_name   # connect to a database
-</span><span class='line'>postgres=# \d                 # list of tables
-</span><span class='line'>postgres=# \d table_name      # schema of a given table
-</span><span class='line'>postgres=# \du                # list roles
-</span><span class='line'>postgres=# \e                 # edit in $EDITOR</span></code></pre></td></tr></table></div></figure>
-
-
-<p>At this point you can just type SQL statements and they&#8217;ll be executed on the database you&#8217;re currently
-connected to.</p>
-
-<h2>User Management</h2>
-
-<p>Once your application goes into production, or basically anywhere outside of your dev machine,
-you&#8217;re going to want to create some users and restrict access.</p>
-
-<p>We have two options for creating users, either from the shell via <code>createuser</code> or via SQL <code>CREATE ROLE</code></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ createuser john
-</span><span class='line'>postgres=# CREATE ROLE john;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>One thing to note here is that by default users created with <code>CREATE ROLE</code> can&#8217;t log in. To allow login you need to provide
-the <code>LOGIN</code> attribute</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>postgres=# CREATE ROLE john LOGIN;
-</span><span class='line'>postgres=# CREATE ROLE john WITH LOGIN; # the same as above
-</span><span class='line'>postgres=# CREATE USER john;            # alternative to CREATE ROLE which adds the LOGIN attribute</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You can also add the <code>LOGIN</code> attribute with <code>ALTER ROLE</code></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>postgres=# ALTER ROLE john LOGIN;
-</span><span class='line'>postgres=# ALTER ROLE john NOLOGIN;   # remove login</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You can also specify multiple attributes when using <code>CREATE ROLE</code> or <code>ALTER ROLE</code>, but bare in mind that <code>ALTER ROLE</code> doesn&#8217;t change the permissions the role already has which you don&#8217;t specify.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>postgres=# CREATE ROLE deploy SUPERUSER LOGIN;
-</span><span class='line'>CREATE ROLE
-</span><span class='line'>postgres=# ALTER ROLE deploy NOSUPERUSER CREATEDB;  # the LOGIN privilege is not touched here
-</span><span class='line'>ALTER ROLE
-</span><span class='line'>postgres=# \du deploy
-</span><span class='line'>           List of roles
-</span><span class='line'> Role name | Attributes | Member of
-</span><span class='line'>-----------+------------+-----------
-</span><span class='line'> deploy    | Create DB  | {}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>There&#8217;s an alternative to <code>CREATE ROLE john WITH LOGIN</code>, and that&#8217;s <code>CREATE USER</code> which automatically creates the <code>LOGIN</code> permission. It is important to understand that users and roles are the same thing. In fact there&#8217;s no such thing as a user in PostgreSQL, only a role with LOGIN permission</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>postgres=# CREATE USER john;
-</span><span class='line'>CREATE ROLE
-</span><span class='line'>postgres=# CREATE ROLE kate;
-</span><span class='line'>CREATE ROLE
-</span><span class='line'>postgres=# \du
-</span><span class='line'>                             List of roles
-</span><span class='line'> Role name |                   Attributes                   | Member of
-</span><span class='line'>-----------+------------------------------------------------+-----------
-</span><span class='line'> darth     | Superuser, Create role, Create DB, Replication | {}
-</span><span class='line'> john      |                                                | {}
-</span><span class='line'> kate      | Cannot login                                   | {}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You can also create groups via <code>CREATE GROUP</code> (which is now aliased to <code>CREATE ROLE</code>), and then grant or revoke
-access to other roles.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>postgres=# CREATE GROUP admin LOGIN;
-</span><span class='line'>CREATE ROLE
-</span><span class='line'>postgres=# GRANT admin TO john;
-</span><span class='line'>GRANT ROLE
-</span><span class='line'>postgres=# \du
-</span><span class='line'>                             List of roles
-</span><span class='line'> Role name |                   Attributes                   | Member of
-</span><span class='line'>-----------+------------------------------------------------+-----------
-</span><span class='line'> admin     |                                                | {}
-</span><span class='line'> darth     | Superuser, Create role, Create DB, Replication | {}
-</span><span class='line'> john      |                                                | {admin}
-</span><span class='line'> kate      | Cannot login                                   | {}
-</span><span class='line'>postgres=# REVOKE admin FROM john;
-</span><span class='line'>REVOKE ROLE
-</span><span class='line'>postgres=# \du
-</span><span class='line'>                             List of roles
-</span><span class='line'> Role name |                   Attributes                   | Member of
-</span><span class='line'>-----------+------------------------------------------------+-----------
-</span><span class='line'> admin     |                                                | {}
-</span><span class='line'> darth     | Superuser, Create role, Create DB, Replication | {}
-</span><span class='line'> john      |                                                | {}
-</span><span class='line'> kate      | Cannot login                                   | {}</span></code></pre></td></tr></table></div></figure>
 
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/08/19/postgresql-basics-by-example/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -852,22 +691,6 @@ example.</p>
 </section>
 
 
-<section>
-  <h1>Latest Tweets</h1>
-  <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
-  </ul>
-  <script type="text/javascript">
-    $.domReady(function(){
-      getTwitterFeed("darthdeus", 4, false);
-    });
-  </script>
-  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
-  
-    <a href="http://twitter.com/darthdeus" class="twitter-follow-button" data-show-count="false">Follow @darthdeus</a>
-  
-</section>
-
 
 
 
@@ -884,19 +707,6 @@ example.</p>
 
 </footer>
   
-
-<script type="text/javascript">
-      var disqus_shortname = 'darthdeus';
-      
-        
-        var disqus_script = 'count.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
 
 
 

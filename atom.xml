@@ -4,7 +4,7 @@
   <title><![CDATA[darthdeus' blog]]></title>
   <link href="http://darthdeus.github.io/atom.xml" rel="self"/>
   <link href="http://darthdeus.github.io/"/>
-  <updated>2014-05-04T15:49:32+02:00</updated>
+  <updated>2014-05-04T16:17:13+02:00</updated>
   <id>http://darthdeus.github.io/</id>
   <author>
     <name><![CDATA[Jakub Arnold]]></name>
@@ -33,6 +33,14 @@
 </pre></td><td class='code'><pre><code class=''><span class='line'>$ psql postgres john
 </span><span class='line'>$ psql -U john postgres</span></code></pre></td></tr></table></div></figure>
 
+
+
+
+<!-- more -->
+
+
+<p><meta http-equiv="refresh" content="0; url=http://blog.sensible.io/2013/08/19/postgresql-basics-by-example.html">
+<link rel="canonical" href="http://blog.sensible.io/2013/08/19/postgresql-basics-by-example.html" /></p>
 
 <p>Connecting to a host/port (by default <code>psql</code> uses a unix socket)</p>
 
